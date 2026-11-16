@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8a60d8e2044c1c4ab9a0e845bf77311, type: 3}
+  m_Name: PlayerConfig
+  m_EditorClassIdentifier: Game.Runtime::Game.PlayerConfig
+  runSpeed: 8
+  acceleration: 90
+  deceleration: 110
+  jumpHeight: 3
+  riseGravityScale: 3
+  fallGravityScale: 5
+  jumpCutGravityMultiplier: 3
+  maxFallSpeed: 22
+  coyoteTime: 0.1
+  jumpBufferTime: 0.12
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 64
+  groundCheckDepth: 0.1
+  attackCooldown: 0.35
+  attackDuration: 0.25
+  attackDamage: 1
+  pogoVelocity: 12
+  forwardHitOffset: {x: 0.95, y: 0.85}
+  forwardHitSize: {x: 1.6, y: 1}
+  upHitOffset: {x: 0, y: 2}
+  upHitSize: {x: 1.2, y: 1.4}
+  downHitOffset: {x: 0, y: -0.4}
+  downHitSize: {x: 1.2, y: 1.2}
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 256
+  knockbackVelocity: {x: 6, y: 7}
+  knockbackTime: 0.2
+  respawnDelay: 1.2
