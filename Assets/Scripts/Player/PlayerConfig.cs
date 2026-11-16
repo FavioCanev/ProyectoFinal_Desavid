@@ -40,6 +40,31 @@ namespace Game
         [Tooltip("Grosor de la zona bajo los pies donde se busca suelo.")]
         [Min(0.01f)] public float groundCheckDepth = 0.1f;
 
+        [Header("Combate")]
+        [Tooltip("Segundos mínimos entre dos ataques.")]
+        [Min(0.05f)] public float attackCooldown = 0.35f;
+        [Tooltip("Cuánto dura la animación de ataque.")]
+        [Min(0.05f)] public float attackDuration = 0.25f;
+        [Min(1)] public int attackDamage = 1;
+        [Tooltip("Velocidad hacia arriba al golpear algo con el ataque hacia abajo (rebote).")]
+        [Min(0f)] public float pogoVelocity = 12f;
+        [Tooltip("Zonas de golpe, relativas a los pies del jugador. El ataque frontal se refleja según la dirección.")]
+        public Vector2 forwardHitOffset = new Vector2(0.95f, 0.85f);
+        public Vector2 forwardHitSize = new Vector2(1.6f, 1.0f);
+        public Vector2 upHitOffset = new Vector2(0f, 2.0f);
+        public Vector2 upHitSize = new Vector2(1.2f, 1.4f);
+        public Vector2 downHitOffset = new Vector2(0f, -0.4f);
+        public Vector2 downHitSize = new Vector2(1.2f, 1.2f);
+        public LayerMask enemyMask;
+
+        [Header("Daño recibido")]
+        [Tooltip("Empujón al recibir un golpe: X se aleja del enemigo, Y hacia arriba.")]
+        public Vector2 knockbackVelocity = new Vector2(6f, 7f);
+        [Tooltip("Segundos sin control tras el empujón.")]
+        [Min(0f)] public float knockbackTime = 0.2f;
+        [Tooltip("Segundos entre morir y reaparecer.")]
+        [Min(0f)] public float respawnDelay = 1.2f;
+
         /// <summary>Velocidad inicial necesaria para alcanzar jumpHeight con la gravedad de subida.</summary>
         public float JumpVelocity => Mathf.Sqrt(2f * Mathf.Abs(Physics2D.gravity.y) * riseGravityScale * jumpHeight);
     }

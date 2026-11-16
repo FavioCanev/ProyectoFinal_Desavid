@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3857779535821567388}
   - component: {fileID: 6605588093281377314}
+  - component: {fileID: 5995106387427503454}
+  - component: {fileID: 7462636371875785141}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -92,6 +94,40 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!95 &5995106387427503454
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7587024719129135698}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: fe63000ce42c8ea4e810643f68544437, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7462636371875785141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7587024719129135698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d320f81711718264398ce5df6612e210, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::Game.AnimationEventSink
 --- !u!1 &8448561073105055212
 GameObject:
   m_ObjectHideFlags: 0
@@ -103,7 +139,11 @@ GameObject:
   - component: {fileID: 8267376763180193901}
   - component: {fileID: 1625862970767382322}
   - component: {fileID: 6080491001719339848}
+  - component: {fileID: 2959805546725301637}
   - component: {fileID: 4483827754753582564}
+  - component: {fileID: 6715003916584207960}
+  - component: {fileID: 4197505358643088602}
+  - component: {fileID: 4194275867654580149}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -191,6 +231,20 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0.8}
   m_Size: {x: 0.8, y: 1.6}
   m_Direction: 0
+--- !u!114 &2959805546725301637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8448561073105055212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aad7ac92494f971439d38ca85b62d3fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::Game.Health
+  maxHealth: 5
+  invulnerabilityTime: 1
 --- !u!114 &4483827754753582564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,3 +259,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::Game.PlayerController
   config: {fileID: 11400000, guid: 2e78ba865aba5eb4c84299a72563a8ef, type: 2}
   visual: {fileID: 3857779535821567388}
+--- !u!114 &6715003916584207960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8448561073105055212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a84a8137973949a41b3f741f8035528c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::Game.PlayerCombat
+--- !u!114 &4197505358643088602
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8448561073105055212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37544b854fbc38441973eab843b6ff30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::Game.PlayerLife
+  sprite: {fileID: 6605588093281377314}
+--- !u!114 &4194275867654580149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8448561073105055212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbbf3e43113f2044f959184c634563ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::Game.PlayerAnimator
+  animator: {fileID: 5995106387427503454}
+  hurtShowTime: 0.25

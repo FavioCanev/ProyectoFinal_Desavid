@@ -26,3 +26,19 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   groundCheckDepth: 0.1
+  attackCooldown: 0.35
+  attackDuration: 0.25
+  attackDamage: 1
+  pogoVelocity: 12
+  forwardHitOffset: {x: 0.95, y: 0.85}
+  forwardHitSize: {x: 1.6, y: 1}
+  upHitOffset: {x: 0, y: 2}
+  upHitSize: {x: 1.2, y: 1.4}
+  downHitOffset: {x: 0, y: -0.4}
+  downHitSize: {x: 1.2, y: 1.2}
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 256
+  knockbackVelocity: {x: 6, y: 7}
+  knockbackTime: 0.2
+  respawnDelay: 1.2
