@@ -22,6 +22,10 @@ MonoBehaviour:
   maxFallSpeed: 22
   coyoteTime: 0.1
   jumpBufferTime: 0.12
+  dashSpeed: 18
+  dashDuration: 0.18
+  dashCooldown: 0.4
+  airDashes: 1
   groundMask:
     serializedVersion: 2
     m_Bits: 64

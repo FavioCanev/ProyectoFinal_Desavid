@@ -42,6 +42,7 @@ namespace Game
             string state =
                 health.IsDead ? "Dead" :
                 Time.time < hurtUntil ? "Hurt" :
+                controller.IsDashing ? "Dash" :
                 combat.IsAttacking ? "Attack" :
                 !controller.IsGrounded ? "Jump" :
                 Mathf.Abs(controller.Velocity.x) > 0.1f ? "Run" : "Idle";

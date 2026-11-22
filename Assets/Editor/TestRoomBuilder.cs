@@ -10,34 +10,28 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.Tilemaps;
 
 /// <summary>
-/// Genera los assets compartidos (configuración, prefabs del jugador y del enemigo, Animators)
-/// y la sala de pruebas con cajas grises. Menú: Game.
+/// Assets compartidos del jugador (configuración, prefab, Animator), utilidades de escena (luz, tilemaps,
+/// cámara) y la sala de pruebas con cajas grises. Los enemigos y los efectos tienen su propio constructor.
+/// Menú: Game.
 /// </summary>
 public static class TestRoomBuilder
 {
     public const string TestRoomPath = "Assets/Scenes/SalaDePruebas.unity";
     private const string ConfigPath = "Assets/Data/PlayerConfig.asset";
     private const string PlayerPrefabPath = "Assets/Prefabs/Player.prefab";
-    private const string EnemyPrefabPath = "Assets/Prefabs/Enemy.prefab";
     private const string PlayerAnimatorPath = "Assets/Data/PlayerAnimator.controller";
-    private const string EnemyAnimatorPath = "Assets/Data/EnemyAnimator.controller";
     private const string MaterialPath = "Assets/Physics/NoFriction.physicsMaterial2D";
     private const string WhitePath = "Assets/Art/Debug/white.png";
     private const string PlayerSheet = "Assets/Art/Player/spriteCapi.png";
     private const string PlayerClips = "Assets/Art/Player/Animation/";
-    private const string CrocFrames = "Assets/Art/Crocodile/Frames/";
-    private const string CrocClips = "Assets/Art/Crocodile/Animation/";
-    // Pivote común de los fotogramas del cocodrilo: centro del cuerpo y pies (calculado al recortarlos).
-    private static readonly Vector2 CrocPivot = new Vector2(0.5f, 0.0226f);
 
     private const float CameraSize = 6f;
     private const float PlayerScale = 0.65f;
-    private const float EnemyScale = 0.75f;
 
     [MenuItem("Game/Build Test Room")]
     public static void Build()
     {
-        PrepareAssets(out Sprite white, out GameObject playerPrefab, out _);
+        PrepareAssets(out Sprite white, out GameObject playerPrefab, out PhysicsMaterial2D _);
         BuildTestRoom(playerPrefab, white);
         AssetDatabase.SaveAssets();
         Debug.Log("TestRoomBuilder: sala de pruebas creada en " + TestRoomPath);
@@ -46,23 +40,22 @@ public static class TestRoomBuilder
     [MenuItem("Game/Open Test Room")]
     public static void OpenTestRoom() => EditorSceneManager.OpenScene(TestRoomPath);
 
-    // ---------- Assets compartidos ----------
+    // ---------- Assets del jugador ----------
 
-    public static void PrepareAssets(out Sprite white, out GameObject playerPrefab, out GameObject enemyPrefab)
+    public static void PrepareAssets(out Sprite white, out GameObject playerPrefab, out PhysicsMaterial2D noFriction)
     {
         foreach (var f in new[] { "Assets/Data", "Assets/Prefabs", "Assets/Physics", "Assets/Art/Debug", "Assets/Scenes" })
             EnsureFolder(f);
 
-        int playerLayer = LayerMask.NameToLayer("Player");
-        int enemyLayer = LayerMask.NameToLayer("Enemy");
         // El jugador y los enemigos se atraviesan (como en Hollow Knight); el daño es por contacto.
-        Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, true);
+        // Los enemigos también se atraviesan entre sí, para no bloquearse al patrullar.
+        int player = LayerMask.NameToLayer("Player"), enemy = LayerMask.NameToLayer("Enemy");
+        Physics2D.IgnoreLayerCollision(player, enemy, true);
+        Physics2D.IgnoreLayerCollision(enemy, enemy, true);
 
         white = EnsureWhiteSprite();
-        PhysicsMaterial2D noFriction = EnsureNoFriction();
-        PlayerConfig config = EnsureConfig();
-        playerPrefab = EnsurePlayerPrefab(config, noFriction);
-        enemyPrefab = EnsureEnemyPrefab(noFriction);
+        noFriction = EnsureNoFriction();
+        playerPrefab = EnsurePlayerPrefab(EnsureConfig(), noFriction);
     }
 
     private static Sprite EnsureWhiteSprite()
@@ -128,6 +121,7 @@ public static class TestRoomBuilder
             ("Idle", PlayerClips + "idle.anim", 1f),
             ("Run", PlayerClips + "correr.anim", 1f),
             ("Jump", PlayerClips + "saltar.anim", 1f),
+            ("Dash", PlayerClips + "correr.anim", 2.2f),
             ("Attack", PlayerClips + "atacar.anim", 0.55f / config.attackDuration),
             ("Hurt", PlayerClips + "daño.anim", 1f),
             ("Dead", PlayerClips + "derrota.anim", 1f));
@@ -145,55 +139,18 @@ public static class TestRoomBuilder
         go.AddComponent<PlayerCombat>();
         Set(go.AddComponent<PlayerLife>(), "sprite", sr);
         Set(go.AddComponent<PlayerAnimator>(), "animator", animator);
+        var feel = go.AddComponent<PlayerFeel>();
+        Set(feel, "visual", visual);
+        Set(feel, "sprite", sr);
 
         var prefab = PrefabUtility.SaveAsPrefabAsset(go, PlayerPrefabPath);
         Object.DestroyImmediate(go);
         return prefab;
     }
 
-    private static GameObject EnsureEnemyPrefab(PhysicsMaterial2D noFriction)
-    {
-        var go = new GameObject("Enemy") { layer = LayerMask.NameToLayer("Enemy") };
+    // ---------- Utilidades de personajes (también las usan los enemigos) ----------
 
-        var rb = go.AddComponent<Rigidbody2D>();
-        rb.bodyType = RigidbodyType2D.Dynamic;
-        rb.freezeRotation = true;
-        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
-        rb.sharedMaterial = noFriction;
-
-        var capsule = go.AddComponent<CapsuleCollider2D>();
-        capsule.direction = CapsuleDirection2D.Vertical;
-        capsule.size = new Vector2(0.9f, 1.5f);
-        capsule.offset = new Vector2(0f, 0.75f);
-        capsule.sharedMaterial = noFriction;
-
-        EnsureCrocodileClips();
-        AnimatorController animatorController = EnsureAnimator(EnemyAnimatorPath, "Idle",
-            ("Idle", CrocClips + "Idle.anim", 1f),
-            ("Walk", CrocClips + "Walk.anim", 1f),
-            ("Attack", CrocClips + "Attack.anim", 1f),
-            ("Hurt", CrocClips + "Hurt.anim", 1f),
-            ("Dead", CrocClips + "Dead.anim", 1f));
-        Sprite crocSprite = AssetDatabase.LoadAssetAtPath<Sprite>(CrocFrames + "croc_r1_00.png");
-        var visual = CreateVisual(go.transform, crocSprite, 9, EnemyScale, animatorController, out _, out Animator animator);
-
-        var health = go.AddComponent<Health>();
-        Set(health, "maxHealth", 3);
-        Set(health, "invulnerabilityTime", 0.2f);
-
-        var enemy = go.AddComponent<EnemyController>();
-        Set(enemy, "visual", visual);
-        Set(enemy, "animator", animator);
-        var so = new SerializedObject(enemy);
-        so.FindProperty("groundMask").intValue = LayerMask.GetMask("Ground");
-        so.ApplyModifiedPropertiesWithoutUndo();
-
-        var prefab = PrefabUtility.SaveAsPrefabAsset(go, EnemyPrefabPath);
-        Object.DestroyImmediate(go);
-        return prefab;
-    }
-
-    private static Transform CreateVisual(Transform parent, Sprite sprite, int sortingOrder, float scale,
+    public static Transform CreateVisual(Transform parent, Sprite sprite, int sortingOrder, float scale,
         RuntimeAnimatorController controller, out SpriteRenderer sr, out Animator animator)
     {
         var visual = new GameObject("Visual");
@@ -207,66 +164,8 @@ public static class TestRoomBuilder
         return visual.transform;
     }
 
-    // ---------- Cocodrilo ----------
-
-    /// <summary>Importa los fotogramas como pixel art (nítido, pivote en los pies) y crea sus animaciones.</summary>
-    private static void EnsureCrocodileClips()
-    {
-        EnsureFolder("Assets/Art/Crocodile/Animation");
-        foreach (string guid in AssetDatabase.FindAssets("t:Texture2D", new[] { CrocFrames.TrimEnd('/') }))
-            ConfigureSprite(AssetDatabase.GUIDToAssetPath(guid), CrocPivot, FilterMode.Point);
-
-        string[] Row(int row, int from, int to) =>
-            Enumerable.Range(from, to - from + 1).Select(i => $"croc_r{row}_{i:00}").ToArray();
-
-        CreateSpriteClip("Walk", Row(0, 0, 9), fps: 12f, loop: true);
-        CreateSpriteClip("Idle", Row(1, 0, 9), fps: 8f, loop: true);
-        CreateSpriteClip("Attack", Row(2, 0, 5), fps: 14f, loop: true);
-        CreateSpriteClip("Hurt", new[] { "croc_r3_00", "croc_r3_02" }, fps: 8f, loop: true);
-        CreateSpriteClip("Dead", Row(3, 3, 5), fps: 8f, loop: false);
-    }
-
-    public static void ConfigureSprite(string path, Vector2 pivot, FilterMode filter)
-    {
-        var importer = (TextureImporter)AssetImporter.GetAtPath(path);
-        importer.textureType = TextureImporterType.Sprite;
-        importer.spriteImportMode = SpriteImportMode.Single;
-        importer.spritePixelsPerUnit = 100;
-        importer.filterMode = filter;
-        importer.mipmapEnabled = false;
-        importer.alphaIsTransparency = true;
-        importer.textureCompression = TextureImporterCompression.Uncompressed;
-        var settings = new TextureImporterSettings();
-        importer.ReadTextureSettings(settings);
-        settings.spriteAlignment = (int)SpriteAlignment.Custom;
-        settings.spritePivot = pivot;
-        importer.SetTextureSettings(settings);
-        importer.SaveAndReimport();
-    }
-
-    private static void CreateSpriteClip(string name, string[] frames, float fps, bool loop)
-    {
-        string path = CrocClips + name + ".anim";
-        AssetDatabase.DeleteAsset(path);
-        var clip = new AnimationClip { frameRate = fps };
-        var binding = EditorCurveBinding.PPtrCurve("", typeof(SpriteRenderer), "m_Sprite");
-        var keys = new ObjectReferenceKeyframe[frames.Length + 1];
-        for (int i = 0; i < frames.Length; i++)
-        {
-            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(CrocFrames + frames[i] + ".png");
-            if (sprite == null) Debug.LogWarning("TestRoomBuilder: falta el fotograma " + frames[i]);
-            keys[i] = new ObjectReferenceKeyframe { time = i / fps, value = sprite };
-        }
-        keys[frames.Length] = new ObjectReferenceKeyframe { time = frames.Length / fps, value = keys[frames.Length - 1].value };
-        AnimationUtility.SetObjectReferenceCurve(clip, binding, keys);
-        var clipSettings = AnimationUtility.GetAnimationClipSettings(clip);
-        clipSettings.loopTime = loop;
-        AnimationUtility.SetAnimationClipSettings(clip, clipSettings);
-        AssetDatabase.CreateAsset(clip, path);
-    }
-
     /// <summary>Animator con estados sueltos (sin transiciones): el código elige cuál reproducir.</summary>
-    private static AnimatorController EnsureAnimator(string path, string defaultState, params (string state, string clip, float speed)[] states)
+    public static AnimatorController EnsureAnimator(string path, string defaultState, params (string state, string clip, float speed)[] states)
     {
         AssetDatabase.DeleteAsset(path);
         var controller = AnimatorController.CreateAnimatorControllerAtPath(path);
@@ -281,6 +180,46 @@ public static class TestRoomBuilder
             if (state == defaultState) machine.defaultState = s;
         }
         return controller;
+    }
+
+    public static void ConfigureSprite(string path, Vector2 pivot, FilterMode filter, int pixelsPerUnit = 100)
+    {
+        var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+        importer.textureType = TextureImporterType.Sprite;
+        importer.spriteImportMode = SpriteImportMode.Single;
+        importer.spritePixelsPerUnit = pixelsPerUnit;
+        importer.filterMode = filter;
+        importer.mipmapEnabled = false;
+        importer.alphaIsTransparency = true;
+        importer.textureCompression = TextureImporterCompression.Uncompressed;
+        var settings = new TextureImporterSettings();
+        importer.ReadTextureSettings(settings);
+        settings.spriteAlignment = (int)SpriteAlignment.Custom;
+        settings.spritePivot = pivot;
+        settings.spriteMeshType = SpriteMeshType.FullRect;   // necesario para repetir el sprite en mosaico
+        importer.SetTextureSettings(settings);
+        importer.SaveAndReimport();
+    }
+
+    /// <summary>Crea un clip que recorre fotogramas (PNG sueltos) de una carpeta.</summary>
+    public static void CreateSpriteClip(string path, string framesFolder, string[] frames, float fps, bool loop)
+    {
+        AssetDatabase.DeleteAsset(path);
+        var clip = new AnimationClip { frameRate = fps };
+        var binding = EditorCurveBinding.PPtrCurve("", typeof(SpriteRenderer), "m_Sprite");
+        var keys = new ObjectReferenceKeyframe[frames.Length + 1];
+        for (int i = 0; i < frames.Length; i++)
+        {
+            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(framesFolder + frames[i] + ".png");
+            if (sprite == null) Debug.LogWarning("TestRoomBuilder: falta el fotograma " + framesFolder + frames[i]);
+            keys[i] = new ObjectReferenceKeyframe { time = i / fps, value = sprite };
+        }
+        keys[frames.Length] = new ObjectReferenceKeyframe { time = frames.Length / fps, value = keys[frames.Length - 1].value };
+        AnimationUtility.SetObjectReferenceCurve(clip, binding, keys);
+        var clipSettings = AnimationUtility.GetAnimationClipSettings(clip);
+        clipSettings.loopTime = loop;
+        AnimationUtility.SetAnimationClipSettings(clip, clipSettings);
+        AssetDatabase.CreateAsset(clip, path);
     }
 
     // ---------- Piezas de escena reutilizables ----------
@@ -301,10 +240,10 @@ public static class TestRoomBuilder
     }
 
     /// <summary>
-    /// Cámara con Cinemachine: sigue al jugador con suavizado, se adelanta hacia donde corre
-    /// y no sale de los límites (objeto "Camera Bounds", que se puede redimensionar).
+    /// Cámara con Cinemachine: sigue al jugador con suavizado, se adelanta hacia donde corre,
+    /// no sale de los límites (objeto "Camera Bounds") y escucha las sacudidas (impulsos).
     /// </summary>
-    public static void AddCameraRig(Transform target, Vector2 boundsCenter, Vector2 boundsSize)
+    public static Camera AddCameraRig(Transform target, Vector2 boundsCenter, Vector2 boundsSize)
     {
         var camGo = new GameObject("Main Camera") { tag = "MainCamera" };
         var cam = camGo.AddComponent<Camera>();
@@ -339,6 +278,8 @@ public static class TestRoomBuilder
 
         var confiner = vcamGo.AddComponent<CinemachineConfiner2D>();
         confiner.BoundingShape2D = poly;
+        vcamGo.AddComponent<CinemachineImpulseListener>();             // recibe las sacudidas de GameFeel
+        return cam;
     }
 
     // ---------- Sala de pruebas ----------
@@ -387,17 +328,40 @@ public static class TestRoomBuilder
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    private static void Set(Object target, string property, int value)
+    public static void Set(Object target, string property, int value)
     {
         var so = new SerializedObject(target);
         so.FindProperty(property).intValue = value;
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    private static void Set(Object target, string property, float value)
+    public static void Set(Object target, string property, float value)
     {
         var so = new SerializedObject(target);
         so.FindProperty(property).floatValue = value;
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    public static void Set(Object target, string property, bool value)
+    {
+        var so = new SerializedObject(target);
+        so.FindProperty(property).boolValue = value;
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    public static void SetMask(Object target, string property, LayerMask mask)
+    {
+        var so = new SerializedObject(target);
+        so.FindProperty(property).intValue = mask.value;
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    public static void SetArray(Object target, string property, Object[] values)
+    {
+        var so = new SerializedObject(target);
+        var arr = so.FindProperty(property);
+        arr.arraySize = values.Length;
+        for (int i = 0; i < values.Length; i++) arr.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
@@ -405,6 +369,7 @@ public static class TestRoomBuilder
     {
         if (AssetDatabase.IsValidFolder(path)) return;
         string parent = Path.GetDirectoryName(path).Replace('\\', '/');
+        if (!AssetDatabase.IsValidFolder(parent)) EnsureFolder(parent);
         AssetDatabase.CreateFolder(parent, Path.GetFileName(path));
     }
 }

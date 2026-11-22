@@ -16,6 +16,7 @@ namespace Game
             var life = other.GetComponentInParent<PlayerLife>();
             if (life == null) return;
             life.SetCheckpoint(transform.position);
+            if (!IsActive) GameFeel.Play(Sfx.Checkpoint);
             IsActive = true;
             if (marker != null) marker.color = activeColor;
         }

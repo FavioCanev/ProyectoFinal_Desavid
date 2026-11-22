@@ -18,6 +18,8 @@ namespace Game
         private readonly HashSet<Health> alreadyHit = new HashSet<Health>();
 
         public event Action<AttackDirection> Attacked;
+        /// <summary>Al acertar un golpe: punto de impacto y si fue un rebote hacia abajo (pogo).</summary>
+        public event Action<Vector2, bool> HitLanded;
         public bool IsAttacking => Time.time < attackingUntil;
         public AttackDirection LastDirection { get; private set; }
 
@@ -61,12 +63,18 @@ namespace Game
 
             alreadyHit.Clear();
             bool hitSomething = false;
+            Vector2 impact = center;
             foreach (Collider2D hit in hits)
             {
                 var target = hit.GetComponentInParent<Health>();
                 if (target == null || target.IsDead || !alreadyHit.Add(target)) continue;
-                if (target.TryDamage(Config.attackDamage, transform.position)) hitSomething = true;
+                if (target.TryDamage(Config.attackDamage, transform.position))
+                {
+                    hitSomething = true;
+                    impact = Vector2.Lerp(center, hit.bounds.center, 0.5f);
+                }
             }
+            if (hitSomething) HitLanded?.Invoke(impact, direction == AttackDirection.Down);
             return hitSomething;
         }
 

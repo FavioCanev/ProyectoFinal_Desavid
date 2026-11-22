@@ -19,9 +19,12 @@ namespace Game
         private CapsuleCollider2D body;
         private PlayerControls controls;
         private JumpAssist jumpAssist;
+        private DashAbility dash;
 
         private float moveInput;
         private bool jumpPressedSinceLastStep;
+        private bool dashPressedSinceLastStep;
+        private Vector2 groundVelocity;
         private bool jumpHeld;
         private int facing = 1;
         private float knockbackLeft;
@@ -30,9 +33,18 @@ namespace Game
 
         /// <summary>Se dispara cuando se pulsa atacar (y hay control).</summary>
         public event Action AttackPressed;
+        public event Action Jumped;
+        /// <summary>Al tocar suelo tras caer; el parámetro es la velocidad de caída.</summary>
+        public event Action<float> Landed;
+        public event Action Dashed;
+
+        private bool wasGrounded = true;
+        private bool wasDashing;
+        private float lastVerticalVelocity;
 
         public bool ControlsEnabled { get; set; } = true;
         public bool IsGrounded { get; private set; }
+        public bool IsDashing => dash.IsDashing;
         /// <summary>1 = mira a la derecha, -1 = a la izquierda.</summary>
         public int Facing => facing;
         /// <summary>Entrada vertical (-1 abajo, 1 arriba), usada para elegir la dirección del ataque.</summary>
@@ -47,6 +59,7 @@ namespace Game
             body = GetComponent<CapsuleCollider2D>();
             controls = new PlayerControls();
             jumpAssist = new JumpAssist(config.coyoteTime, config.jumpBufferTime);
+            dash = new DashAbility(config.dashDuration, config.dashCooldown, config.airDashes);
         }
 
         private void OnEnable() => controls.Gameplay.Enable();
@@ -62,6 +75,7 @@ namespace Game
             if (ControlsEnabled && controls.Gameplay.Jump.WasPressedThisFrame()) jumpPressedSinceLastStep = true;
             jumpHeld = controls.Gameplay.Jump.IsPressed();
             if (ControlsEnabled && controls.Gameplay.Attack.WasPressedThisFrame()) AttackPressed?.Invoke();
+            if (ControlsEnabled && controls.Gameplay.Dash.WasPressedThisFrame()) dashPressedSinceLastStep = true;
 
             if (moveInput != 0f && knockbackLeft <= 0f) Face((int)moveInput);
         }
@@ -69,12 +83,36 @@ namespace Game
         private void FixedUpdate()
         {
             float dt = Time.fixedDeltaTime;
-            IsGrounded = CheckGround();
+            IsGrounded = CheckGround(out groundVelocity);
+            if (IsGrounded && !wasGrounded && lastVerticalVelocity < -1f) Landed?.Invoke(-lastVerticalVelocity);
+            wasGrounded = IsGrounded;
+            lastVerticalVelocity = rb.linearVelocity.y;
 
             jumpAssist.Tick(dt, IsGrounded, jumpPressedSinceLastStep);
             jumpPressedSinceLastStep = false;
 
+            dash.Tick(dt, IsGrounded);
+            if (dashPressedSinceLastStep && knockbackLeft <= 0f && dash.TryStart(moveInput != 0f ? (int)moveInput : facing, IsGrounded))
+                Dashed?.Invoke();
+            dashPressedSinceLastStep = false;
+
+            if (dash.IsDashing)
+            {
+                // Dash: velocidad horizontal fija y sin gravedad mientras dura.
+                Face(dash.Direction);
+                rb.gravityScale = 0f;
+                rb.linearVelocity = new Vector2(dash.Direction * config.dashSpeed, 0f);
+                wasDashing = true;
+                return;
+            }
+
             Vector2 v = rb.linearVelocity;
+            if (wasDashing)
+            {
+                // Al terminar, el dash corta en seco (como en Hollow Knight): nada de deslizarse.
+                v.x = Mathf.Clamp(v.x, -config.runSpeed, config.runSpeed);
+                wasDashing = false;
+            }
 
             if (knockbackLeft > 0f)
             {
@@ -82,7 +120,8 @@ namespace Game
             }
             else
             {
-                float targetX = moveInput * config.runSpeed;
+                // Sobre una plataforma móvil, "quieto" significa moverse con ella.
+                float targetX = moveInput * config.runSpeed + groundVelocity.x;
                 float rate = moveInput != 0f ? config.acceleration : config.deceleration;
                 v.x = Mathf.MoveTowards(v.x, targetX, rate * dt);
             }
@@ -96,6 +135,7 @@ namespace Game
             {
                 v.y = config.JumpVelocity;
                 bouncing = false;
+                Jumped?.Invoke();
             }
 
             if (v.y <= 0f) bouncing = false;
@@ -104,6 +144,9 @@ namespace Game
 
             rb.linearVelocity = v;
         }
+
+        /// <summary>Pide un dash como si se pulsara Shift (lo usan las pruebas).</summary>
+        public void RequestDash() => dashPressedSinceLastStep = true;
 
         /// <summary>Lanza al jugador hacia arriba (rebote al golpear algo con el ataque hacia abajo).</summary>
         public void Bounce(float verticalVelocity)
@@ -118,6 +161,7 @@ namespace Game
             rb.linearVelocity = velocity;
             knockbackLeft = duration;
             bouncing = false;
+            dash.Cancel();
         }
 
         /// <summary>Mueve al jugador al instante (reaparición) y lo detiene.</summary>
@@ -129,6 +173,7 @@ namespace Game
             knockbackLeft = 0f;
             pendingVerticalVelocity = null;
             bouncing = false;
+            dash.Cancel();
         }
 
         public void Face(int direction)
@@ -152,14 +197,18 @@ namespace Game
             return config.fallGravityScale;
         }
 
-        private bool CheckGround()
+        /// <summary>¿Hay suelo bajo los pies? Si es una plataforma móvil, devuelve también su velocidad.</summary>
+        private bool CheckGround(out Vector2 platformVelocity)
         {
             Bounds b = body.bounds;
             float depth = config.groundCheckDepth;
             // La caja se apoya justo bajo los pies; un poco más estrecha que el cuerpo para no rozar paredes.
             Vector2 center = new Vector2(b.center.x, b.min.y - depth * 0.5f + 0.02f);
             Vector2 size = new Vector2(b.size.x * 0.9f, depth);
-            return Physics2D.OverlapBox(center, size, 0f, config.groundMask) != null;
+            Collider2D hit = Physics2D.OverlapBox(center, size, 0f, config.groundMask);
+            var platform = hit != null ? hit.GetComponentInParent<MovingPlatform>() : null;
+            platformVelocity = platform != null ? platform.Velocity : Vector2.zero;
+            return hit != null;
         }
     }
 }

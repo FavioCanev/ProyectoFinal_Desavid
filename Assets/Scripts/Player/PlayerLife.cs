@@ -16,6 +16,9 @@ namespace Game
         private Health health;
         private float respawnAt = -1f;
 
+        /// <summary>Al caer en el ácido o al vacío.</summary>
+        public event System.Action HazardTouched;
+
         public Vector2 Checkpoint { get; private set; }
         public Health Health => health;
 
@@ -57,6 +60,7 @@ namespace Game
         public void HazardHit()
         {
             if (health.IsDead) return;
+            HazardTouched?.Invoke();
             health.TryDamage(1, transform.position, ignoreInvulnerability: true);
             controller.Teleport(Checkpoint);
         }

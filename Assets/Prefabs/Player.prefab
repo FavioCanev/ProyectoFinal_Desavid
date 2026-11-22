@@ -144,6 +144,7 @@ GameObject:
   - component: {fileID: 6715003916584207960}
   - component: {fileID: 4197505358643088602}
   - component: {fileID: 4194275867654580149}
+  - component: {fileID: 4073951379102816232}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -298,3 +299,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Runtime::Game.PlayerAnimator
   animator: {fileID: 5995106387427503454}
   hurtShowTime: 0.25
+--- !u!114 &4073951379102816232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8448561073105055212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa330593134f56c439695b2b17ea6838, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Runtime::Game.PlayerFeel
+  visual: {fileID: 3857779535821567388}
+  sprite: {fileID: 6605588093281377314}
+  jumpStretch: {x: 0.82, y: 1.2}
+  landSquash: {x: 1.25, y: 0.78}
+  squashRecovery: 14
+  afterimageColor: {r: 0.55, g: 1, b: 0.75, a: 0.55}
+  afterimageInterval: 0.035
+  hitStopOnHit: 0.055
+  hitStopOnHurt: 0.12
