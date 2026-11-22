@@ -24,5 +24,13 @@ namespace Game.Tests
             Assert.IsTrue(Physics2D.GetIgnoreLayerCollision(player, enemy),
                 "El jugador y los enemigos chocan físicamente; el daño debe ser solo por contacto.");
         }
+
+        [Test]
+        public void Enemies_PassThroughEachOther()
+        {
+            int enemy = LayerMask.NameToLayer("Enemy");
+            Assert.IsTrue(Physics2D.GetIgnoreLayerCollision(enemy, enemy),
+                "Los enemigos chocan entre sí y se bloquean al patrullar.");
+        }
     }
 }

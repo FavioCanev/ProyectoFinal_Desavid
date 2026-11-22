@@ -17,6 +17,7 @@ namespace Game
             if (Reached || other.GetComponentInParent<PlayerLife>() == null) return;
             Reached = true;
             if (completedMessage != null) completedMessage.SetActive(true);
+            GameFeel.Play(Sfx.Goal);
         }
 
         private void Update()

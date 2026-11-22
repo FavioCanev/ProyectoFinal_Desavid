@@ -35,6 +35,16 @@ namespace Game
         [Tooltip("Segundos que se recuerda un salto pulsado justo antes de aterrizar.")]
         [Min(0f)] public float jumpBufferTime = 0.12f;
 
+        [Header("Dash")]
+        [Tooltip("Velocidad horizontal durante el dash (unidades por segundo).")]
+        [Min(0f)] public float dashSpeed = 18f;
+        [Tooltip("Cuánto dura el dash. Distancia = velocidad × duración.")]
+        [Min(0.01f)] public float dashDuration = 0.18f;
+        [Tooltip("Segundos de espera tras terminar un dash.")]
+        [Min(0f)] public float dashCooldown = 0.4f;
+        [Tooltip("Dashes permitidos en el aire antes de volver a tocar el suelo.")]
+        [Min(0)] public int airDashes = 1;
+
         [Header("Detección de suelo")]
         public LayerMask groundMask;
         [Tooltip("Grosor de la zona bajo los pies donde se busca suelo.")]

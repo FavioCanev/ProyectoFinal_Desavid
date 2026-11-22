@@ -6,7 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 /// <summary>
-/// Saca capturas de Nivel1 en varios puntos (inicio, cada enemigo, vigas, meta) a Logs/Capturas,
+/// Saca capturas de Nivel1 en varios puntos a Logs/Capturas, más una vista general alejada,
 /// para revisar el aspecto sin jugar. Menú: Game > Capturas del Nivel 1.
 /// </summary>
 public static class LevelScreenshots
@@ -18,27 +18,48 @@ public static class LevelScreenshots
     public static void Capture()
     {
         EditorSceneManager.OpenScene(Level1Builder.ScenePath);
+        if (Directory.Exists(OutputFolder)) Directory.Delete(OutputFolder, true);
         Directory.CreateDirectory(OutputFolder);
 
         var cam = Camera.main;
         var brain = cam.GetComponent<CinemachineBrain>();
         if (brain != null) brain.enabled = false;   // la cámara se coloca a mano para cada captura
-        var background = Object.FindFirstObjectByType<ParallaxBackground>();
 
-        Shot(cam, background, "1_inicio", Level1Layout.OnSurface(Level1Layout.PlayerStart));
-        for (int i = 0; i < Level1Layout.Enemies.Length; i++)
-            Shot(cam, background, $"{i + 2}_enemigo{i + 1}", Level1Layout.OnSurface(Level1Layout.Enemies[i]));
-        Shot(cam, background, "5_vigas", Level1Layout.OnSurface(new Vector2Int(155, 13)));
-        Shot(cam, background, "6_meta", Level1Layout.OnSurface(Level1Layout.Goal));
+        Shot(cam, "01_inicio", Level1Layout.OnSurface(Level1Layout.PlayerStart));
+        Shot(cam, "02_hueco_dash", Level1Layout.OnSurface(new Vector2Int(38, 0)));
+        Shot(cam, "03_guerreros", Level1Layout.OnSurface(new Vector2Int(80, 0)));
+        Shot(cam, "04_torre", Level1Layout.OnSurface(new Vector2Int(160, 8)));
+        Shot(cam, "05_vigas", Level1Layout.OnSurface(new Vector2Int(215, 21)));
+        Shot(cam, "06_saliente", Level1Layout.OnSurface(new Vector2Int(250, 20)));
+        Shot(cam, "07_plataformas", Level1Layout.OnSurface(new Vector2Int(298, 6)));
+        Shot(cam, "08_arena", Level1Layout.OnSurface(new Vector2Int(395, 0)));
+
+        // Vista general: cámara muy alejada para ver el trazado completo.
+        float size = cam.orthographicSize;
+        RectInt b = Level1Layout.CameraBounds;
+        cam.orthographicSize = b.width * Level1Layout.Cell / (2f * Width / Height);
+        Shot(cam, "00_vista_general", new Vector2((b.xMin + b.width * 0.5f) * Level1Layout.Cell, (b.yMin + b.height * 0.5f) * Level1Layout.Cell - 1.5f));
+        cam.orthographicSize = size;
         Debug.Log("LevelScreenshots: capturas guardadas en " + Path.GetFullPath(OutputFolder));
     }
 
-    private static void Shot(Camera cam, ParallaxBackground background, string name, Vector2 focus)
+    // Igual que en el juego: la cámara no muestra nada fuera de los límites del nivel.
+    private static Vector3 Confine(Camera cam, Vector2 p)
+    {
+        RectInt b = Level1Layout.CameraBounds;
+        float c = Level1Layout.Cell, h = cam.orthographicSize, w = h * Width / Height;
+        float minX = b.xMin * c + w, maxX = b.xMax * c - w, minY = b.yMin * c + h, maxY = b.yMax * c - h;
+        float x = minX <= maxX ? Mathf.Clamp(p.x, minX, maxX) : (b.xMin + b.width * 0.5f) * c;
+        float y = minY <= maxY ? Mathf.Clamp(p.y, minY, maxY) : (b.yMin + b.height * 0.5f) * c;
+        return new Vector3(x, y, -10f);
+    }
+
+    private static void Shot(Camera cam, string name, Vector2 focus)
     {
         var rt = new RenderTexture(Width, Height, 24);
-        cam.targetTexture = rt;   // antes de Refresh: así el fondo usa el formato 16:9 de la captura
-        cam.transform.position = new Vector3(focus.x, focus.y + 1.5f, -10f);
-        if (background != null) background.Refresh(cam);
+        cam.targetTexture = rt;   // antes de Refresh: así las capas usan el formato 16:9 de la captura
+        cam.transform.position = Confine(cam, new Vector2(focus.x, focus.y + 1.5f));
+        foreach (var layer in Object.FindObjectsByType<ParallaxLayer>(FindObjectsSortMode.None)) layer.Refresh(cam);
         cam.Render();
 
         RenderTexture.active = rt;
