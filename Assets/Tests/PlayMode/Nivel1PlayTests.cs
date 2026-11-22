@@ -187,6 +187,37 @@ namespace Game.Tests
             Assert.Less(Mathf.Abs(playerMoved - platformMoved), 0.5f, "El jugador no se movió con la plataforma.");
         }
 
+        [UnityTest]
+        public IEnumerator Dash_BlocksEnemyDamage_ButNotAcid()
+        {
+            player.Face(1);
+            player.RequestDash();
+            yield return new WaitForFixedUpdate();
+            Assert.IsTrue(player.IsDashing, "El dash no empezó.");
+
+            int before = life.Health.Current;
+            Assert.IsFalse(life.Health.TryDamage(1, player.transform.position), "Un golpe hizo daño durante el dash.");
+            Assert.AreEqual(before, life.Health.Current);
+
+            life.HazardHit();
+            Assert.AreEqual(before - 1, life.Health.Current, "El ácido debe dañar aunque se esté haciendo dash.");
+        }
+
+        [UnityTest]
+        public IEnumerator PauseMenu_FreezesGame_AndResumes()
+        {
+            var pause = Object.FindFirstObjectByType<PauseMenu>();
+            pause.SetPaused(true);
+            yield return null;
+            Assert.AreEqual(0f, Time.timeScale, "La pausa no detuvo el tiempo.");
+            Assert.IsFalse(player.enabled, "El jugador sigue leyendo teclas en pausa.");
+
+            pause.SetPaused(false);
+            yield return null;
+            Assert.AreEqual(1f, Time.timeScale);
+            Assert.IsTrue(player.enabled);
+        }
+
         private EnemyController Nearest(System.Func<EnemyController, bool> filter) =>
             Object.FindObjectsByType<EnemyController>(FindObjectsSortMode.None)
                 .Where(filter)

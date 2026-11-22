@@ -34,6 +34,20 @@ public static class LevelScreenshots
         Shot(cam, "07_plataformas", Level1Layout.OnSurface(new Vector2Int(298, 6)));
         Shot(cam, "08_arena", Level1Layout.OnSurface(new Vector2Int(395, 0)));
 
+        // Interfaz: el HUD se dibuja sobre la cámara solo para estas capturas (no se guarda la escena).
+        var hud = GameObject.Find("HUD").GetComponent<Canvas>();
+        var pausePanel = Object.FindAnyObjectByType<PauseMenu>().transform.GetChild(0).gameObject;
+        hud.renderMode = RenderMode.ScreenSpaceCamera;
+        hud.worldCamera = cam;
+        hud.planeDistance = 1f;
+        hud.sortingOrder = 1000;   // por encima de los sprites del nivel, como en el juego
+        pausePanel.SetActive(false);
+        Shot(cam, "09_interfaz", Level1Layout.OnSurface(new Vector2Int(380, 0)));
+        pausePanel.SetActive(true);
+        Shot(cam, "10_pausa", Level1Layout.OnSurface(new Vector2Int(380, 0)));
+        hud.renderMode = RenderMode.ScreenSpaceOverlay;
+        pausePanel.SetActive(false);
+
         // Vista general: cámara muy alejada para ver el trazado completo.
         float size = cam.orthographicSize;
         RectInt b = Level1Layout.CameraBounds;

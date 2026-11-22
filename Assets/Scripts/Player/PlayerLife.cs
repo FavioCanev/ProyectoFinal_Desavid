@@ -29,6 +29,7 @@ namespace Game
             controller = GetComponent<PlayerController>();
             health = GetComponent<Health>();
             Checkpoint = transform.position;
+            health.Shielded = () => controller.IsDashing;   // el dash atraviesa enemigos y proyectiles; el ácido daña igual
             health.Damaged += OnDamaged;
             health.Died += OnDied;
         }

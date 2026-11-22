@@ -21,6 +21,8 @@ namespace Game
         [SerializeField] private bool fitToCover;
         [Tooltip("Rectángulo del nivel por el que se mueve la cámara (unidades del mundo).")]
         [SerializeField] private Rect levelBounds;
+        [Tooltip("Desplazamiento fijo respecto al resultado. Con follow.y = 1, deja la pieza pegada a un borde de la pantalla.")]
+        [SerializeField] private Vector2 screenOffset;
         [Tooltip("Distancia detrás de la cámara (solo fondos).")]
         [SerializeField] private float depth = 20f;
 
@@ -52,7 +54,7 @@ namespace Game
         private void Follow()
         {
             Vector3 c = cam.transform.position;
-            Vector2 p = anchorPosition + Vector2.Scale((Vector2)c - anchorPosition, follow);
+            Vector2 p = anchorPosition + Vector2.Scale((Vector2)c - anchorPosition, follow) + screenOffset;
             float z = anchor == Anchor.LevelCenter ? c.z + depth : transform.position.z;
             transform.position = new Vector3(p.x, p.y, z);
         }

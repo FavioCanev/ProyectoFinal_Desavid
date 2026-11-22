@@ -36,13 +36,6 @@ namespace Game
             public Mover(int fromX, int fromRow, int toX, int toRow, int width = 4) { FromX = fromX; FromRow = fromRow; ToX = toX; ToRow = toRow; Width = width; }
         }
 
-        public readonly struct Sign
-        {
-            public readonly Vector2Int Cell;
-            public readonly string Text;
-            public Sign(int x, int y, string text) { Cell = new Vector2Int(x, y); Text = text; }
-        }
-
         public static readonly Block[] Blocks =
         {
             new Block(-14, -11, -8, 34, Kind.Earth),   // pared izquierda
@@ -66,8 +59,15 @@ namespace Game
             new Block(235, 262, 14, 20, Kind.Earth),   // saliente flotante
             // Tramo 5: plataformas móviles (ver Movers) hasta otra saliente
             new Block(318, 345, -1, 4, Kind.Earth),
-            // Tramo 6: arena del jefe
+            // Tramo 6: arena del jefe (como en Hollow Knight: suelo amplio para esquivar, con alturas para escapar).
+            // Repisas de 3 filas en los costados; el jefe (3,2 de alto) cabe bajo las plataformas de la fila 9,
+            // que se alcanzan saltando desde las repisas. La plataforma central (fila 13) se alcanza desde ellas.
             new Block(346, 420, -8, 0, Kind.Earth),
+            new Block(354, 359, 1, 3, Kind.Earth),      // repisa izquierda
+            new Block(412, 420, 1, 3, Kind.Earth),      // repisa derecha (la meta aparece aquí)
+            new Block(363, 368, 9, 9, Kind.Metal),
+            new Block(381, 392, 13, 13, Kind.Metal),
+            new Block(405, 410, 9, 9, Kind.Metal),
             new Block(421, 424, -8, 34, Kind.Earth),   // pared derecha
         };
 
@@ -96,18 +96,9 @@ namespace Game
             new Vector2Int(237, 20), new Vector2Int(320, 4), new Vector2Int(347, 0),
         };
 
-        public static readonly Sign[] Signs =
-        {
-            new Sign(4, 0, "Mover: A/D o ←/→\nSaltar: Espacio"),
-            new Sign(24, 0, "Shift: dash\n(también en el aire)"),
-            new Sign(55, 0, "} o Supr: atacar\n↑ + ataque: hacia arriba"),
-            new Sign(116, 0, "En el aire: ↓ + ataque\nsobre un enemigo = rebote"),
-            new Sign(240, 20, "Brillan en rojo\nantes de atacar"),
-        };
-
         // Arena del jefe
-        public static readonly Vector2Int BossSpawn = new Vector2Int(400, 0);
-        public static readonly Vector2Int Goal = new Vector2Int(414, 0);
+        public static readonly Vector2Int BossSpawn = new Vector2Int(396, 0);
+        public static readonly Vector2Int Goal = new Vector2Int(416, 3);
         /// <summary>Al entrar en estas columnas empieza la pelea.</summary>
         public static readonly RectInt ArenaTrigger = new RectInt(356, 1, 62, 14);
         /// <summary>Puerta que se cierra detrás del jugador durante la pelea.</summary>

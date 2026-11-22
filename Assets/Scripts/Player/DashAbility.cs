@@ -18,6 +18,9 @@ namespace Game
         public int Direction { get; private set; } = 1;
         public bool IsDashing => timeLeft > 0f;
 
+        /// <summary>True si ahora mismo se podría empezar un dash (para el indicador del HUD).</summary>
+        public bool IsReady(bool grounded) => !IsDashing && cooldownLeft <= 0f && (grounded || airDashesLeft > 0);
+
         public DashAbility(float duration, float cooldown, int airDashes)
         {
             this.duration = Math.Max(0.01f, duration);

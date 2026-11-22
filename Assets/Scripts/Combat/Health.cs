@@ -24,8 +24,12 @@ namespace Game
         public bool IsDead => Pool.IsDead;
         public bool IsInvulnerable => Pool.IsInvulnerable(Time.time);
 
+        /// <summary>Si devuelve true, el daño normal no cuenta (por ejemplo, durante el dash). El de peligros sí.</summary>
+        public Func<bool> Shielded { get; set; }
+
         public bool TryDamage(int amount, Vector2 source, bool ignoreInvulnerability = false)
         {
+            if (!ignoreInvulnerability && Shielded != null && Shielded()) return false;
             if (!Pool.TryDamage(amount, Time.time, ignoreInvulnerability)) return false;
             Changed?.Invoke();
             Damaged?.Invoke(source);

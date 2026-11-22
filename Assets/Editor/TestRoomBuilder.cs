@@ -25,7 +25,7 @@ public static class TestRoomBuilder
     private const string PlayerSheet = "Assets/Art/Player/spriteCapi.png";
     private const string PlayerClips = "Assets/Art/Player/Animation/";
 
-    private const float CameraSize = 6f;
+    public const float CameraSize = 6f;
     private const float PlayerScale = 0.65f;
 
     [MenuItem("Game/Build Test Room")]

@@ -45,6 +45,7 @@ namespace Game
         public bool ControlsEnabled { get; set; } = true;
         public bool IsGrounded { get; private set; }
         public bool IsDashing => dash.IsDashing;
+        public bool DashReady => dash.IsReady(IsGrounded);
         /// <summary>1 = mira a la derecha, -1 = a la izquierda.</summary>
         public int Facing => facing;
         /// <summary>Entrada vertical (-1 abajo, 1 arriba), usada para elegir la dirección del ataque.</summary>
