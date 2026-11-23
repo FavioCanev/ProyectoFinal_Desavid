@@ -6,18 +6,18 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 /// <summary>
-/// Saca capturas de Nivel1 en varios puntos a Logs/Capturas, más una vista general alejada,
-/// para revisar el aspecto sin jugar. Menú: Game > Capturas del Nivel 1.
+/// Saca capturas de Nivel3 en varios puntos a Logs/Capturas, más una vista general alejada,
+/// para revisar el aspecto sin jugar. Menú: Game > Capturas del Nivel 3.
 /// </summary>
 public static class LevelScreenshots
 {
     private const string OutputFolder = "Logs/Capturas";
     private const int Width = 1280, Height = 720;
 
-    [MenuItem("Game/Capturas del Nivel 1")]
+    [MenuItem("Game/Capturas del Nivel 3")]
     public static void Capture()
     {
-        EditorSceneManager.OpenScene(Level1Builder.ScenePath);
+        EditorSceneManager.OpenScene(Level3Builder.ScenePath);
         if (Directory.Exists(OutputFolder)) Directory.Delete(OutputFolder, true);
         Directory.CreateDirectory(OutputFolder);
 
@@ -25,20 +25,34 @@ public static class LevelScreenshots
         var brain = cam.GetComponent<CinemachineBrain>();
         if (brain != null) brain.enabled = false;   // la cámara se coloca a mano para cada captura
 
-        Shot(cam, "01_inicio", Level1Layout.OnSurface(Level1Layout.PlayerStart));
-        Shot(cam, "02_hueco_dash", Level1Layout.OnSurface(new Vector2Int(38, 0)));
-        Shot(cam, "03_guerreros", Level1Layout.OnSurface(new Vector2Int(80, 0)));
-        Shot(cam, "04_torre", Level1Layout.OnSurface(new Vector2Int(160, 8)));
-        Shot(cam, "05_vigas", Level1Layout.OnSurface(new Vector2Int(215, 21)));
-        Shot(cam, "06_saliente", Level1Layout.OnSurface(new Vector2Int(250, 20)));
-        Shot(cam, "07_plataformas", Level1Layout.OnSurface(new Vector2Int(298, 6)));
-        Shot(cam, "08_arena", Level1Layout.OnSurface(new Vector2Int(395, 0)));
+        Shot(cam, "01_inicio", Level3Layout.OnSurface(Level3Layout.PlayerStart));
+        Shot(cam, "02_hueco_dash", Level3Layout.OnSurface(new Vector2Int(38, 0)));
+        Shot(cam, "03_guerreros", Level3Layout.OnSurface(new Vector2Int(80, 0)));
+        Shot(cam, "04_torre", Level3Layout.OnSurface(new Vector2Int(160, 8)));
+        Shot(cam, "05_vigas", Level3Layout.OnSurface(new Vector2Int(215, 21)));
+        Shot(cam, "06_saliente", Level3Layout.OnSurface(new Vector2Int(250, 20)));
+        Shot(cam, "07_plataformas", Level3Layout.OnSurface(new Vector2Int(298, 6)));
+        Shot(cam, "08_arena", Level3Layout.OnSurface(new Vector2Int(395, 0)));
+
+        // Interfaz: el HUD se dibuja sobre la cámara solo para estas capturas (no se guarda la escena).
+        var hud = GameObject.Find("HUD").GetComponent<Canvas>();
+        var pausePanel = Object.FindAnyObjectByType<PauseMenu>().transform.GetChild(0).gameObject;
+        hud.renderMode = RenderMode.ScreenSpaceCamera;
+        hud.worldCamera = cam;
+        hud.planeDistance = 1f;
+        hud.sortingOrder = 1000;   // por encima de los sprites del nivel, como en el juego
+        pausePanel.SetActive(false);
+        Shot(cam, "09_interfaz", Level3Layout.OnSurface(new Vector2Int(380, 0)));
+        pausePanel.SetActive(true);
+        Shot(cam, "10_pausa", Level3Layout.OnSurface(new Vector2Int(380, 0)));
+        hud.renderMode = RenderMode.ScreenSpaceOverlay;
+        pausePanel.SetActive(false);
 
         // Vista general: cámara muy alejada para ver el trazado completo.
         float size = cam.orthographicSize;
-        RectInt b = Level1Layout.CameraBounds;
-        cam.orthographicSize = b.width * Level1Layout.Cell / (2f * Width / Height);
-        Shot(cam, "00_vista_general", new Vector2((b.xMin + b.width * 0.5f) * Level1Layout.Cell, (b.yMin + b.height * 0.5f) * Level1Layout.Cell - 1.5f));
+        RectInt b = Level3Layout.CameraBounds;
+        cam.orthographicSize = b.width * Level3Layout.Cell / (2f * Width / Height);
+        Shot(cam, "00_vista_general", new Vector2((b.xMin + b.width * 0.5f) * Level3Layout.Cell, (b.yMin + b.height * 0.5f) * Level3Layout.Cell - 1.5f));
         cam.orthographicSize = size;
         Debug.Log("LevelScreenshots: capturas guardadas en " + Path.GetFullPath(OutputFolder));
     }
@@ -46,8 +60,8 @@ public static class LevelScreenshots
     // Igual que en el juego: la cámara no muestra nada fuera de los límites del nivel.
     private static Vector3 Confine(Camera cam, Vector2 p)
     {
-        RectInt b = Level1Layout.CameraBounds;
-        float c = Level1Layout.Cell, h = cam.orthographicSize, w = h * Width / Height;
+        RectInt b = Level3Layout.CameraBounds;
+        float c = Level3Layout.Cell, h = cam.orthographicSize, w = h * Width / Height;
         float minX = b.xMin * c + w, maxX = b.xMax * c - w, minY = b.yMin * c + h, maxY = b.yMax * c - h;
         float x = minX <= maxX ? Mathf.Clamp(p.x, minX, maxX) : (b.xMin + b.width * 0.5f) * c;
         float y = minY <= maxY ? Mathf.Clamp(p.y, minY, maxY) : (b.yMin + b.height * 0.5f) * c;

@@ -4,7 +4,8 @@ using UnityEngine;
 namespace Game
 {
     /// <summary>
-    /// Movimiento del jugador: correr, salto de altura variable, coyote time y jump buffer.
+    /// Movimiento del jugador: correr, salto de altura variable, coyote time y jump buffer; y nado en 4 direcciones
+    /// cuando está dentro de un WaterVolume (bajo el agua se puede atacar y hacer dash igual que en tierra).
     /// También aplica empujones (al recibir daño) y rebotes (al golpear hacia abajo).
     /// La entrada se lee en Update; la física se aplica en FixedUpdate.
     /// </summary>
@@ -21,6 +22,7 @@ namespace Game
         private JumpAssist jumpAssist;
         private DashAbility dash;
 
+        private UnityEngine.InputSystem.InputAction shoot;
         private float moveInput;
         private bool jumpPressedSinceLastStep;
         private bool dashPressedSinceLastStep;
@@ -37,6 +39,8 @@ namespace Game
         /// <summary>Al tocar suelo tras caer; el parámetro es la velocidad de caída.</summary>
         public event Action<float> Landed;
         public event Action Dashed;
+        /// <summary>Se pulsó disparar plasma (Fin) y hay control.</summary>
+        public event Action ShootPressed;
 
         private bool wasGrounded = true;
         private bool wasDashing;
@@ -45,6 +49,13 @@ namespace Game
         public bool ControlsEnabled { get; set; } = true;
         public bool IsGrounded { get; private set; }
         public bool IsDashing => dash.IsDashing;
+        public bool DashReady => dash.IsReady(IsGrounded || Swimming);
+        /// <summary>Dentro del agua: nado en 4 direcciones, sin gravedad.</summary>
+        public bool Swimming { get; set; }
+        /// <summary>Hacia dónde dispara: adelante; bajo el agua también en diagonal con arriba/abajo.</summary>
+        public Vector2 Aim => Swimming && Mathf.Abs(VerticalInput) > 0.5f
+            ? new Vector2(moveInput, Mathf.Sign(VerticalInput)).normalized
+            : new Vector2(facing, 0f);
         /// <summary>1 = mira a la derecha, -1 = a la izquierda.</summary>
         public int Facing => facing;
         /// <summary>Entrada vertical (-1 abajo, 1 arriba), usada para elegir la dirección del ataque.</summary>
@@ -58,8 +69,9 @@ namespace Game
             rb = GetComponent<Rigidbody2D>();
             body = GetComponent<CapsuleCollider2D>();
             controls = new PlayerControls();
-            jumpAssist = new JumpAssist(config.coyoteTime, config.jumpBufferTime);
+            jumpAssist = new JumpAssist(config.coyoteTime, config.jumpBufferTime, config.airJumps);
             dash = new DashAbility(config.dashDuration, config.dashCooldown, config.airDashes);
+            shoot = controls.asset.FindAction("Gameplay/Shoot", throwIfNotFound: true);
         }
 
         private void OnEnable() => controls.Gameplay.Enable();
@@ -73,9 +85,10 @@ namespace Game
             moveInput = ControlsEnabled && Mathf.Abs(move.x) > 0.2f ? Mathf.Sign(move.x) : 0f;
 
             if (ControlsEnabled && controls.Gameplay.Jump.WasPressedThisFrame()) jumpPressedSinceLastStep = true;
-            jumpHeld = controls.Gameplay.Jump.IsPressed();
+            jumpHeld = controls.Gameplay.Jump.IsPressed() || jumpHeldByCode;
             if (ControlsEnabled && controls.Gameplay.Attack.WasPressedThisFrame()) AttackPressed?.Invoke();
             if (ControlsEnabled && controls.Gameplay.Dash.WasPressedThisFrame()) dashPressedSinceLastStep = true;
+            if (ControlsEnabled && shoot.WasPressedThisFrame()) ShootPressed?.Invoke();
 
             if (moveInput != 0f && knockbackLeft <= 0f) Face((int)moveInput);
         }
@@ -91,8 +104,9 @@ namespace Game
             jumpAssist.Tick(dt, IsGrounded, jumpPressedSinceLastStep);
             jumpPressedSinceLastStep = false;
 
-            dash.Tick(dt, IsGrounded);
-            if (dashPressedSinceLastStep && knockbackLeft <= 0f && dash.TryStart(moveInput != 0f ? (int)moveInput : facing, IsGrounded))
+            bool dashRecharges = IsGrounded || Swimming;   // bajo el agua el dash se recarga como en el suelo
+            dash.Tick(dt, dashRecharges);
+            if (dashPressedSinceLastStep && knockbackLeft <= 0f && dash.TryStart(moveInput != 0f ? (int)moveInput : facing, dashRecharges))
                 Dashed?.Invoke();
             dashPressedSinceLastStep = false;
 
@@ -112,6 +126,12 @@ namespace Game
                 // Al terminar, el dash corta en seco (como en Hollow Knight): nada de deslizarse.
                 v.x = Mathf.Clamp(v.x, -config.runSpeed, config.runSpeed);
                 wasDashing = false;
+            }
+
+            if (Swimming)
+            {
+                Swim(v, dt);
+                return;
             }
 
             if (knockbackLeft > 0f)
@@ -137,6 +157,12 @@ namespace Game
                 bouncing = false;
                 Jumped?.Invoke();
             }
+            else if (knockbackLeft <= 0f && jumpAssist.TryConsumeAirJump())
+            {
+                v.y = config.AirJumpVelocity;   // doble salto
+                bouncing = false;
+                Jumped?.Invoke();
+            }
 
             if (v.y <= 0f) bouncing = false;
             rb.gravityScale = GravityScaleFor(v.y);
@@ -144,6 +170,29 @@ namespace Game
 
             rb.linearVelocity = v;
         }
+
+        /// <summary>Nado: acelera hacia la dirección pulsada; sin pulsar arriba/abajo se hunde despacio.</summary>
+        private void Swim(Vector2 v, float dt)
+        {
+            rb.gravityScale = 0f;
+            if (knockbackLeft > 0f) { knockbackLeft -= dt; rb.linearVelocity = v; return; }
+            float vertical = ControlsEnabled && Mathf.Abs(VerticalInput) > 0.2f ? Mathf.Sign(VerticalInput) : 0f;
+            Vector2 target = new Vector2(moveInput, vertical);
+            target = target.sqrMagnitude > 0f ? target.normalized * config.swimSpeed : new Vector2(0f, -config.sinkSpeed);
+            if (pendingVerticalVelocity.HasValue) { v.y = pendingVerticalVelocity.Value; pendingVerticalVelocity = null; }
+            rb.linearVelocity = Vector2.MoveTowards(v, target, config.swimAcceleration * dt);
+        }
+
+        private bool jumpHeldByCode;
+
+        /// <summary>Pulsa saltar como si se apretara Espacio (lo usan las pruebas). "held": mantenerlo apretado.</summary>
+        public void RequestJump(bool held)
+        {
+            jumpPressedSinceLastStep = true;
+            jumpHeldByCode = held;
+        }
+
+        public void ReleaseJump() => jumpHeldByCode = false;
 
         /// <summary>Pide un dash como si se pulsara Shift (lo usan las pruebas).</summary>
         public void RequestDash() => dashPressedSinceLastStep = true;
@@ -153,6 +202,7 @@ namespace Game
         {
             pendingVerticalVelocity = verticalVelocity;
             bouncing = true;
+            jumpAssist.RefillAirJumps();
         }
 
         /// <summary>Empuja al jugador y le quita el control horizontal durante un momento.</summary>

@@ -1,0 +1,678 @@
+fileFormatVersion: 2
+guid: f910c7fa833a4e94cbc65c036fb86587
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 9026454270870436289
+    second: minbss (1)_0
+  - first:
+      213: 7819465377530318528
+    second: minbss (1)_1
+  - first:
+      213: 4807793505294059043
+    second: minbss (1)_2
+  - first:
+      213: 139090117162778257
+    second: minbss (1)_3
+  - first:
+      213: 350830807780645005
+    second: minbss (1)_4
+  - first:
+      213: 856757837502757790
+    second: minbss (1)_5
+  - first:
+      213: 1275049006544717555
+    second: minbss (1)_6
+  - first:
+      213: 9150698226198462149
+    second: minbss (1)_7
+  - first:
+      213: 1903393929028077059
+    second: minbss (1)_8
+  - first:
+      213: -5770178009594882033
+    second: minbss (1)_9
+  - first:
+      213: -1929860295114948945
+    second: minbss (1)_10
+  - first:
+      213: 7663844851345870592
+    second: minbss (1)_11
+  - first:
+      213: 1724264408073916551
+    second: minbss (1)_12
+  - first:
+      213: 4560429485403757374
+    second: minbss (1)_13
+  - first:
+      213: 4428123160119920681
+    second: minbss (1)_14
+  - first:
+      213: 1053085642375407670
+    second: minbss (1)_15
+  - first:
+      213: -8041258556242084562
+    second: minbss (1)_16
+  - first:
+      213: -8951299762844160209
+    second: minbss (1)_17
+  - first:
+      213: 4613922491484968056
+    second: minbss (1)_18
+  - first:
+      213: -3539856527037764282
+    second: minbss (1)_19
+  - first:
+      213: 4756335706687143286
+    second: minbss (1)_20
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: minbss (1)_0
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 1169
+        width: 379
+        height: 350
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c93a8cc558644d70800000000000000
+      internalID: 9026454270870436289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_1
+      rect:
+        serializedVersion: 2
+        x: 503
+        y: 1172
+        width: 375
+        height: 344
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ce0921e452548c60800000000000000
+      internalID: 7819465377530318528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_2
+      rect:
+        serializedVersion: 2
+        x: 956
+        y: 1172
+        width: 377
+        height: 339
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3268b7468b6b8b240800000000000000
+      internalID: 4807793505294059043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_3
+      rect:
+        serializedVersion: 2
+        x: 1418
+        y: 1172
+        width: 372
+        height: 341
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 19e314189b52ee100800000000000000
+      internalID: 139090117162778257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_4
+      rect:
+        serializedVersion: 2
+        x: 1883
+        y: 1171
+        width: 364
+        height: 348
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d88570ac2c66ed400800000000000000
+      internalID: 350830807780645005
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_5
+      rect:
+        serializedVersion: 2
+        x: 2335
+        y: 1172
+        width: 376
+        height: 339
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9b32e2c6b0d3eb00800000000000000
+      internalID: 856757837502757790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_6
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 797
+        width: 374
+        height: 347
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f60052e052e1b110800000000000000
+      internalID: 1275049006544717555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_7
+      rect:
+        serializedVersion: 2
+        x: 515
+        y: 797
+        width: 364
+        height: 345
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ce3b53ed8fcdfe70800000000000000
+      internalID: 9150698226198462149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_8
+      rect:
+        serializedVersion: 2
+        x: 988
+        y: 805
+        width: 342
+        height: 325
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3068a5f91b63a6a10800000000000000
+      internalID: 1903393929028077059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_9
+      rect:
+        serializedVersion: 2
+        x: 1420
+        y: 797
+        width: 365
+        height: 335
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0893570ca53cefa0800000000000000
+      internalID: -5770178009594882033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_10
+      rect:
+        serializedVersion: 2
+        x: 1888
+        y: 798
+        width: 359
+        height: 338
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: faefa835942c735e0800000000000000
+      internalID: -1929860295114948945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_11
+      rect:
+        serializedVersion: 2
+        x: 2367
+        y: 797
+        width: 337
+        height: 336
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00f4d2a99427b5a60800000000000000
+      internalID: 7663844851345870592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_12
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 392
+        width: 440
+        height: 376
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7805816f751dde710800000000000000
+      internalID: 1724264408073916551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_13
+      rect:
+        serializedVersion: 2
+        x: 547
+        y: 395
+        width: 466
+        height: 362
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3b55bc6476e94f30800000000000000
+      internalID: 4560429485403757374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_14
+      rect:
+        serializedVersion: 2
+        x: 1325
+        y: 397
+        width: 480
+        height: 321
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 928c0ac8d8ad37d30800000000000000
+      internalID: 4428123160119920681
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_15
+      rect:
+        serializedVersion: 2
+        x: 2311
+        y: 397
+        width: 395
+        height: 375
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 638a9dfefcf4d9e00800000000000000
+      internalID: 1053085642375407670
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_16
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 22
+        width: 392
+        height: 350
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e2dbe1092f5b76090800000000000000
+      internalID: -8041258556242084562
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_17
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 21
+        width: 372
+        height: 346
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2fa2adaa4896c380800000000000000
+      internalID: -8951299762844160209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_18
+      rect:
+        serializedVersion: 2
+        x: 1086
+        y: 21
+        width: 354
+        height: 315
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87495267f02f70040800000000000000
+      internalID: 4613922491484968056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_19
+      rect:
+        serializedVersion: 2
+        x: 1652
+        y: 27
+        width: 409
+        height: 331
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64de01e5e37efdec0800000000000000
+      internalID: -3539856527037764282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: minbss (1)_20
+      rect:
+        serializedVersion: 2
+        x: 2282
+        y: 17
+        width: 430
+        height: 329
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67df7950026e10240800000000000000
+      internalID: 4756335706687143286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 9d5de2a780bfdc0468e4b9f5af8eca13
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      minbss (1)_0: 9026454270870436289
+      minbss (1)_1: 7819465377530318528
+      minbss (1)_10: -1929860295114948945
+      minbss (1)_11: 7663844851345870592
+      minbss (1)_12: 1724264408073916551
+      minbss (1)_13: 4560429485403757374
+      minbss (1)_14: 4428123160119920681
+      minbss (1)_15: 1053085642375407670
+      minbss (1)_16: -8041258556242084562
+      minbss (1)_17: -8951299762844160209
+      minbss (1)_18: 4613922491484968056
+      minbss (1)_19: -3539856527037764282
+      minbss (1)_2: 4807793505294059043
+      minbss (1)_20: 4756335706687143286
+      minbss (1)_3: 139090117162778257
+      minbss (1)_4: 350830807780645005
+      minbss (1)_5: 856757837502757790
+      minbss (1)_6: 1275049006544717555
+      minbss (1)_7: 9150698226198462149
+      minbss (1)_8: 1903393929028077059
+      minbss (1)_9: -5770178009594882033
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

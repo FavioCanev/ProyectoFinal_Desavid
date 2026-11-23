@@ -24,8 +24,10 @@ public static class TestRoomBuilder
     private const string WhitePath = "Assets/Art/Debug/white.png";
     private const string PlayerSheet = "Assets/Art/Player/spriteCapi.png";
     private const string PlayerClips = "Assets/Art/Player/Animation/";
+    private const string SwimFrames = "Assets/Art/Player/Submarino/";
+    private const string SwimClips = "Assets/Art/Player/Submarino/Animation/";
 
-    private const float CameraSize = 6f;
+    public const float CameraSize = 6f;
     private const float PlayerScale = 0.65f;
 
     [MenuItem("Game/Build Test Room")]
@@ -117,6 +119,7 @@ public static class TestRoomBuilder
         capsule.offset = new Vector2(0f, 0.8f);
         capsule.sharedMaterial = noFriction;
 
+        EnsureSwimClips();
         AnimatorController animatorController = EnsureAnimator(PlayerAnimatorPath, "Idle",
             ("Idle", PlayerClips + "idle.anim", 1f),
             ("Run", PlayerClips + "correr.anim", 1f),
@@ -124,7 +127,11 @@ public static class TestRoomBuilder
             ("Dash", PlayerClips + "correr.anim", 2.2f),
             ("Attack", PlayerClips + "atacar.anim", 0.55f / config.attackDuration),
             ("Hurt", PlayerClips + "daño.anim", 1f),
-            ("Dead", PlayerClips + "derrota.anim", 1f));
+            ("Dead", PlayerClips + "derrota.anim", 1f),
+            // Bajo el agua (hoja submarina hecha con Gemini, alineada a los pies de la original)
+            ("SwimIdle", SwimClips + "SwimIdle.anim", 1f), ("Swim", SwimClips + "Swim.anim", 1f), ("SwimUp", SwimClips + "SwimUp.anim", 1f),
+            ("SwimDash", SwimClips + "Swim.anim", 2.2f), ("SwimAttack", SwimClips + "SwimAttack.anim", 0.5f / config.attackDuration),
+            ("SwimHurt", SwimClips + "SwimHurt.anim", 1f), ("SwimDead", SwimClips + "SwimDead.anim", 1f));
         Sprite playerSprite = AssetDatabase.LoadAllAssetRepresentationsAtPath(PlayerSheet).OfType<Sprite>().First(s => s.name == "spriteCapi_0");
         var visual = CreateVisual(go.transform, playerSprite, 10, PlayerScale, animatorController, out SpriteRenderer sr, out Animator animator);
         visual.gameObject.AddComponent<AnimationEventSink>();   // las animaciones importadas llaman a eventos
@@ -142,10 +149,53 @@ public static class TestRoomBuilder
         var feel = go.AddComponent<PlayerFeel>();
         Set(feel, "visual", visual);
         Set(feel, "sprite", sr);
+        Set(go.AddComponent<PlayerPlasma>(), "shotPrefab", EnsurePlasmaShot());
 
         var prefab = PrefabUtility.SaveAsPrefabAsset(go, PlayerPrefabPath);
         Object.DestroyImmediate(go);
         return prefab;
+    }
+
+    /// <summary>Clips del capibara bajo el agua: cada fila de la hoja submarina es una animación.</summary>
+    private static void EnsureSwimClips()
+    {
+        foreach (string guid in AssetDatabase.FindAssets("t:Texture2D", new[] { SwimFrames.TrimEnd('/') }))
+            ConfigureSprite(AssetDatabase.GUIDToAssetPath(guid), new Vector2(0.5f, 0.03125f), FilterMode.Point);   // mismo pivote que la hoja original
+        EnsureFolder(SwimClips.TrimEnd('/'));
+        string[] Row(int r, int from, int to) => Enumerable.Range(from, to - from + 1).Select(c => $"sub_r{r}_{c}").ToArray();
+        CreateSpriteClip(SwimClips + "SwimIdle.anim", SwimFrames, Row(0, 0, 7), 8f, true);
+        CreateSpriteClip(SwimClips + "Swim.anim", SwimFrames, Row(1, 0, 7), 12f, true);
+        CreateSpriteClip(SwimClips + "SwimUp.anim", SwimFrames, Row(3, 0, 7), 10f, true);
+        CreateSpriteClip(SwimClips + "SwimAttack.anim", SwimFrames, Row(5, 0, 7), 16f, false);
+        CreateSpriteClip(SwimClips + "SwimHurt.anim", SwimFrames, Row(7, 0, 2), 10f, false);
+        CreateSpriteClip(SwimClips + "SwimDead.anim", SwimFrames, Row(7, 3, 7), 8f, false);
+    }
+
+    /// <summary>Disparo de plasma: una cápsula cian brillante con núcleo blanco.</summary>
+    private static PlayerProjectile EnsurePlasmaShot()
+    {
+        const string circlePath = "Assets/Art/Fx/circle.png";
+        ConfigureSprite(circlePath, new Vector2(0.5f, 0.5f), FilterMode.Bilinear, pixelsPerUnit: 64);
+        Sprite circle = AssetDatabase.LoadAssetAtPath<Sprite>(circlePath);
+        var go = new GameObject("PlasmaShot");
+        var rb = go.AddComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+        foreach (var (name, size, color, order) in new[]
+                 { ("Brillo", new Vector2(1.1f, 0.45f), new Color(0.3f, 1f, 1f, 0.55f), 14), ("Núcleo", new Vector2(0.6f, 0.18f), Color.white, 15) })
+        {
+            var part = new GameObject(name);
+            part.transform.SetParent(go.transform, false);
+            part.transform.localScale = new Vector3(size.x, size.y, 1f);
+            var r = part.AddComponent<SpriteRenderer>();
+            r.sprite = circle;
+            r.color = color;
+            r.sortingOrder = order;
+        }
+        go.AddComponent<PlayerProjectile>();
+        var prefab = PrefabUtility.SaveAsPrefabAsset(go, "Assets/Prefabs/PlasmaShot.prefab");
+        Object.DestroyImmediate(go);
+        return prefab.GetComponent<PlayerProjectile>();
     }
 
     // ---------- Utilidades de personajes (también las usan los enemigos) ----------

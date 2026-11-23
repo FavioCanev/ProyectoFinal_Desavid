@@ -29,6 +29,12 @@ namespace Game
         [Tooltip("Velocidad máxima de caída (unidades por segundo).")]
         [Min(0f)] public float maxFallSpeed = 22f;
 
+        [Header("Doble salto")]
+        [Tooltip("Saltos extra en el aire; se recargan al tocar el suelo o al rebotar con el ataque hacia abajo.")]
+        [Min(0)] public int airJumps = 1;
+        [Tooltip("Altura del salto en el aire (algo menor que el normal, como las alas de Hollow Knight).")]
+        [Min(0f)] public float airJumpHeight = 2.6f;
+
         [Header("Comodidad")]
         [Tooltip("Segundos después de salir de una plataforma en los que aún se puede saltar.")]
         [Min(0f)] public float coyoteTime = 0.1f;
@@ -67,6 +73,19 @@ namespace Game
         public Vector2 downHitSize = new Vector2(1.2f, 1.2f);
         public LayerMask enemyMask;
 
+        [Header("Nado (dentro de un WaterVolume)")]
+        [Min(0f)] public float swimSpeed = 5.3f;
+        [Min(0f)] public float swimAcceleration = 24f;
+        [Tooltip("Velocidad a la que se hunde sin pulsar arriba/abajo.")]
+        [Min(0f)] public float sinkSpeed = 0.6f;
+
+        [Header("Plasma (tecla Fin; se consigue en el nivel 2)")]
+        [Min(1)] public int plasmaCapacity = 3;
+        [Min(0f)] public float plasmaReloadTime = 6f;
+        [Min(0f)] public float plasmaCooldown = 0.42f;
+        [Min(0f)] public float plasmaSpeed = 16f;
+        [Min(1)] public int plasmaDamage = 1;
+
         [Header("Daño recibido")]
         [Tooltip("Empujón al recibir un golpe: X se aleja del enemigo, Y hacia arriba.")]
         public Vector2 knockbackVelocity = new Vector2(6f, 7f);
@@ -77,5 +96,6 @@ namespace Game
 
         /// <summary>Velocidad inicial necesaria para alcanzar jumpHeight con la gravedad de subida.</summary>
         public float JumpVelocity => Mathf.Sqrt(2f * Mathf.Abs(Physics2D.gravity.y) * riseGravityScale * jumpHeight);
+        public float AirJumpVelocity => Mathf.Sqrt(2f * Mathf.Abs(Physics2D.gravity.y) * riseGravityScale * airJumpHeight);
     }
 }

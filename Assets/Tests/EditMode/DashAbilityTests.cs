@@ -47,6 +47,18 @@ namespace Game.Tests
         }
 
         [Test]
+        public void IsReady_MatchesWhetherADashCouldStart()
+        {
+            var dash = Create();
+            Assert.IsTrue(dash.IsReady(grounded: true));
+            dash.TryStart(1, grounded: false);
+            Assert.IsFalse(dash.IsReady(grounded: false), "Durante el dash.");
+            Advance(dash, 0.7f, grounded: false);
+            Assert.IsFalse(dash.IsReady(grounded: false), "Ya gastó el dash aéreo.");
+            Assert.IsTrue(dash.IsReady(grounded: true), "En el suelo vuelve a estar listo.");
+        }
+
+        [Test]
         public void Direction_FollowsSign()
         {
             var dash = Create();

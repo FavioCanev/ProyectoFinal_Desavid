@@ -3,6 +3,7 @@
     "rootNamespace": "Game.Tests",
     "references": [
         "Game.Runtime",
+        "Game.Nivel2",
         "UnityEngine.TestRunner"
     ],
     "includePlatforms": [],
