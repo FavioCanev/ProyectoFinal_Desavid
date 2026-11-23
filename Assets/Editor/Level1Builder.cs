@@ -163,9 +163,11 @@ public static class Level1Builder
         background.GetComponent<SpriteRenderer>().sortingOrder = -100;
         var layer = background.AddComponent<ParallaxLayer>();
         var so = new SerializedObject(layer);
-        so.FindProperty("follow").vector2Value = new Vector2(0.85f, 0.9f);
+        // Sus bordes no encajan: una sola imagen estirada (no en mosaico), que se mueve poco para no crecer de más.
+        so.FindProperty("follow").vector2Value = new Vector2(0.94f, 0.94f);
         so.FindProperty("anchor").enumValueIndex = (int)ParallaxLayer.Anchor.LevelCenter;
         so.FindProperty("fitToCover").boolValue = true;
+        so.FindProperty("tile").boolValue = false;
         so.FindProperty("levelBounds").rectValue = levelRect;
         so.ApplyModifiedPropertiesWithoutUndo();
     }

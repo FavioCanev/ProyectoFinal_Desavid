@@ -19,6 +19,8 @@ namespace Game
         [SerializeField] private Anchor anchor = Anchor.LevelCenter;
         [Tooltip("Escalar y repetir el sprite para cubrir siempre la pantalla (fondos en mosaico).")]
         [SerializeField] private bool fitToCover;
+        [Tooltip("Con fitToCover: repetir en mosaico a lo ancho (solo para imágenes cuyos bordes encajan). Si no, se estira para cubrir.")]
+        [SerializeField] private bool tile = true;
         [Tooltip("Rectángulo del nivel por el que se mueve la cámara (unidades del mundo).")]
         [SerializeField] private Rect levelBounds;
         [Tooltip("Desplazamiento fijo respecto al resultado. Con follow.y = 1, deja la pieza pegada a un borde de la pantalla.")]
@@ -69,6 +71,14 @@ namespace Game
             float travelY = Mathf.Max(0f, levelBounds.height - viewH) * Mathf.Abs(1f - follow.y);
             float travelX = Mathf.Max(0f, levelBounds.width - viewW) * Mathf.Abs(1f - follow.x);
             Vector2 spriteSize = sr.sprite.bounds.size;
+            if (!tile)
+            {
+                // Sin mosaico: una sola imagen, escalada para cubrir todo lo que recorre la cámara (sin costuras).
+                float cover = Mathf.Max((viewH + travelY) / spriteSize.y, (viewW + travelX) / spriteSize.x) * 1.04f;
+                transform.localScale = new Vector3(cover, cover, 1f);
+                sr.drawMode = SpriteDrawMode.Simple;
+                return;
+            }
             float scale = (viewH + travelY) / spriteSize.y * 1.04f;
             transform.localScale = new Vector3(scale, scale, 1f);
             sr.drawMode = SpriteDrawMode.Tiled;

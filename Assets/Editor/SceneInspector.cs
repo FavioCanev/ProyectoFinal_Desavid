@@ -55,6 +55,60 @@ public static class SceneInspector
         Shot(cam, output, new Vector2((columns - 1) * 0.8f, -(rows - 1) * 0.8f));
     }
 
+    /// <summary>
+    /// Recorre el camino del jugador como lo vería la cámara del juego: cada "paso" unidades busca el suelo
+    /// (de arriba abajo, dentro de los límites de la cámara) y saca una captura 16:9 a esa altura.
+    /// Junta las capturas de a 4 en hojas de revisión. Uso: -executeMethod SceneInspector.PathShots -scene Ruta.unity
+    /// </summary>
+    public static void PathShots()
+    {
+        string[] args = System.Environment.GetCommandLineArgs();
+        string scenePath = args[System.Array.IndexOf(args, "-scene") + 1];
+        EditorSceneManager.OpenScene(scenePath);
+        string name = Path.GetFileNameWithoutExtension(scenePath);
+        string folder = "Logs/Recorrido_" + name;
+        if (Directory.Exists(folder)) Directory.Delete(folder, true);
+        Directory.CreateDirectory(folder);
+
+        var cam = Camera.main;
+        foreach (var b in cam.GetComponents<Behaviour>()) if (b != null && b.GetType().Name.Contains("Brain")) b.enabled = false;
+        var confiner = Object.FindObjectsByType<Collider2D>(FindObjectsSortMode.None).FirstOrDefault(c => c.name == "Camera Bounds");
+        Bounds limits = confiner != null ? confiner.bounds : new Bounds(Vector3.zero, Vector3.one * 400f);
+        float h = cam.orthographicSize, w = h * 16f / 9f;
+        int ground = LayerMask.GetMask("Ground");
+        var shots = new System.Collections.Generic.List<string>();
+        for (float x = limits.min.x + w; x <= limits.max.x - w + 0.01f; x += w * 1.5f)
+        {
+            // El suelo más bajo con aire encima (no el techo): donde camina el jugador; la cámara lo enfoca 1,5 más arriba.
+            var hits = Physics2D.RaycastAll(new Vector2(x, limits.max.y), Vector2.down, limits.size.y, ground)
+                .Where(hh => !hh.collider.isTrigger && hh.normal.y > 0.7f && !Physics2D.OverlapPoint(hh.point + Vector2.up * 0.6f, ground)).ToArray();
+            float y = hits.Length > 0 ? hits.Min(hh => hh.point.y) + 1.5f : limits.center.y;
+            y = Mathf.Clamp(y, limits.min.y + h, limits.max.y - h);
+            string file = $"{folder}/{shots.Count:00}_x{Mathf.RoundToInt(x)}.png";
+            Shot(cam, file, new Vector2(Mathf.Clamp(x, limits.min.x + w, limits.max.x - w), y));
+            shots.Add(file);
+        }
+        // Hojas de revisión: 4 capturas (640x360) por hoja, con su posición escrita.
+        for (int s = 0; s < shots.Count; s += 4)
+        {
+            var sheet = new Texture2D(1280, 720, TextureFormat.RGB24, false);
+            for (int k = 0; k < 4 && s + k < shots.Count; k++)
+            {
+                var src = new Texture2D(2, 2);
+                src.LoadImage(File.ReadAllBytes(shots[s + k]));
+                int ox = (k % 2) * 640, oy = (1 - k / 2) * 360;
+                for (int py = 0; py < 360; py++)
+                    for (int px = 0; px < 640; px++)
+                        sheet.SetPixel(ox + px, oy + py, src.GetPixel(px * 2, py * 2));
+                Object.DestroyImmediate(src);
+            }
+            sheet.Apply();
+            File.WriteAllBytes($"{folder}/hoja_{s / 4:00}.png", sheet.EncodeToPNG());
+            Object.DestroyImmediate(sheet);
+        }
+        Debug.Log($"SceneInspector: {shots.Count} capturas del recorrido en {folder}");
+    }
+
     private static void Dump(string file)
     {
         var sb = new StringBuilder();

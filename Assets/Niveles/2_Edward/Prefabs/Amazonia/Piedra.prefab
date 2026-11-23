@@ -301,3 +301,5 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 64
+  explosionRadius: 0
+  spin: 0

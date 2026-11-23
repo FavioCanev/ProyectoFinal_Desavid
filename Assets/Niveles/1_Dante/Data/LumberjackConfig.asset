@@ -24,6 +24,7 @@ MonoBehaviour:
   corpseTime: 1.2
   attackPause: 0.5
   windupColor: {r: 1, g: 0.35, b: 0.3, a: 1}
+  enragedTimeScale: 1
   swipe:
     enabled: 1
     minRange: 0

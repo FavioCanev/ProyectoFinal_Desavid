@@ -72,7 +72,7 @@ public static class Level45Builder
                 (P("cajas"), 43f, 0f, 1f, -3), (P("farol"), 53f, 0f, 1.3f, -3), (P("basura"), 77f, 0f, 0.9f, -3), (P("banca"), 88f, 0f, 1f, -3),
                 (P("farol"), 103f, 0f, 1.3f, -3), (P("cajas"), 113f, 0f, 1f, -3), (P("farol"), 130f, 0f, 1.3f, -3), (P("basura"), 138f, 0f, 0.9f, -3),
                 (P("reja_izq"), 151f, 0f, 1f, -4), (P("porton"), 153.5f, 0f, 1f, -4), (P("reja_der"), 156f, 0f, 1f, -4),
-                (L4 + "Art/Fondos/minertown_fachada.png", 163f, -1.3f, 3.4f, -6),
+                (L4 + "Art/Fondos/minertown_fachada.png", 159.5f, -1.3f, 3.4f, -6),
             },
             PlayerStart = new Vector2Int(4, 0), Goal = new Vector2Int(161, 0),
             CameraBounds = new RectInt(-3, -3, 173, 20),

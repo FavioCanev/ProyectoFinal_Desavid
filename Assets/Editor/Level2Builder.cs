@@ -67,10 +67,13 @@ public static class Level2Builder
         foreach (var (n, x) in new[] { ("00", -132f), ("03", -104f), ("05", -76f), ("01", -48f), ("04", -20f) })
             Decor(objects, Piece(n), new Vector2(x, Ceiling + 0.3f), 0.8f, order: -2, hanging: true);
 
-        // La unión con su panorama (x = 0) queda tapada por vegetación de primer plano.
-        Decor(objects, Piece("10"), new Vector2(0.5f, Floor - 0.6f), 0.9f, order: 40);
-        Decor(objects, Piece("06"), new Vector2(0f, Ceiling + 0.5f), 1f, order: 40, hanging: true);
-        Decor(objects, Piece("12"), new Vector2(-2.5f, Floor - 0.3f), 0.8f, order: 40);
+        // La unión con su panorama (x = 0) queda tapada por una cortina de vegetación en primer plano, de arriba abajo:
+        // matorrales abajo, follaje en el medio y lianas colgando arriba (se ve como la entrada al claro).
+        // Las piezas más altas: un matorral grande desde el suelo (~12 de alto) y follaje colgando del techo (~14).
+        foreach (var (n, x, y, s) in new[] { ("09", 0f, Floor - 0.8f, 1.35f), ("10", -2f, Floor - 0.6f, 1.1f), ("12", 1.8f, Floor - 0.4f, 0.9f) })
+            Decor(objects, Piece(n), new Vector2(x, y), s, order: 40);
+        foreach (var (n, x, s) in new[] { ("06", 0f, 1.35f), ("04", -2f, 1.2f), ("03", 2f, 1.1f) })
+            Decor(objects, Piece(n), new Vector2(x, Ceiling + 0.5f), s, order: 40, hanging: true);
 
         var enemies = new GameObject("Caimanes del camino").transform;
         GameObject warrior = AssetDatabase.LoadAssetAtPath<GameObject>(Level3Prefabs + "Warrior.prefab");
@@ -160,6 +163,9 @@ public static class Level2Builder
         foreach (var root in scene.GetRootGameObjects())
             if (root.name.StartsWith("Capibara") || root.name == "Main Camera" || root.name == "EventSystem") Object.DestroyImmediate(root);
         Object.DestroyImmediate(GameObject.Find("Límite izquierdo"));   // la selva nueva sigue hacia la izquierda
+        // Su suelo invisible del lago tiene una franja marrón dibujada que tapa el fondo pintado: solo se deja la colisión.
+        if (aquatic)
+            foreach (var sr in GameObject.Find("Suelo").GetComponentsInChildren<SpriteRenderer>(true)) sr.enabled = false;
         int ground = LayerMask.NameToLayer("Ground"), arena = LayerMask.NameToLayer("Enemy");
         foreach (var c in Object.FindObjectsByType<Collider2D>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             if (c.gameObject.layer == arena && c.GetComponentInParent<AdventureBoss>() == null) c.gameObject.layer = ground;   // su capa "Arena" era la 8
