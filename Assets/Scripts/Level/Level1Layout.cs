@@ -61,7 +61,7 @@ namespace Game
         /// <summary>Carteles del tutorial: cada control justo antes de necesitarlo.</summary>
         public static readonly (Vector2Int Cell, string Text)[] Signs =
         {
-            (new Vector2Int(-33, -11), "Mover: A/D o ←/→\nSaltar: Espacio"),
+            (new Vector2Int(-33, -11), "Mover: A/D o ←/→\nSaltar: Espacio (2 = doble)"),
             (new Vector2Int(-19, -11), "Junta monedas: valen\nen todo el juego"),
             (new Vector2Int(0, -9), "Las banderas guardan\ntu avance (3 vidas)"),
             (new Vector2Int(44, -5), "Shift: dash\n(también en el aire)"),

@@ -62,7 +62,7 @@ public static class Level2Builder
         Sprite Piece(string n) => AssetDatabase.LoadAssetAtPath<Sprite>($"{Pieces}Bosque/bosque_{n}.png");
         foreach (var (n, x, s) in new[] { ("28", -128f, 0.7f), ("19", -108f, 0.8f), ("20", -90f, 0.7f), ("17", -66f, 0.6f), ("31", -47f, 0.8f), ("22", -25f, 0.8f), ("32", -8f, 0.6f) })
             Decor(objects, Piece(n), new Vector2(x, Floor - 0.15f), s, order: -3);
-        foreach (var (n, x, s) in new[] { ("12", -138f, 0.6f), ("15", -118f, 0.6f), ("13", -97f, 0.5f), ("24", -78f, 0.6f), ("11", -57f, 0.5f), ("16", -42f, 0.6f), ("25", -14f, 0.6f) })
+        foreach (var (n, x, s) in new[] { ("12", -138f, 0.6f), ("15", -118f, 0.6f), ("13", -103f, 0.5f), ("24", -78f, 0.6f), ("11", -65f, 0.5f), ("16", -42f, 0.6f), ("25", -14f, 0.6f) })
             Decor(objects, Piece(n), new Vector2(x, Floor - 0.1f), s, order: 12);   // plantas delante de los pies
         foreach (var (n, x) in new[] { ("00", -132f), ("03", -104f), ("05", -76f), ("01", -48f), ("04", -20f) })
             Decor(objects, Piece(n), new Vector2(x, Ceiling + 0.3f), 0.8f, order: -2, hanging: true);

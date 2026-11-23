@@ -29,6 +29,12 @@ namespace Game
         [Tooltip("Velocidad máxima de caída (unidades por segundo).")]
         [Min(0f)] public float maxFallSpeed = 22f;
 
+        [Header("Doble salto")]
+        [Tooltip("Saltos extra en el aire; se recargan al tocar el suelo o al rebotar con el ataque hacia abajo.")]
+        [Min(0)] public int airJumps = 1;
+        [Tooltip("Altura del salto en el aire (algo menor que el normal, como las alas de Hollow Knight).")]
+        [Min(0f)] public float airJumpHeight = 2.6f;
+
         [Header("Comodidad")]
         [Tooltip("Segundos después de salir de una plataforma en los que aún se puede saltar.")]
         [Min(0f)] public float coyoteTime = 0.1f;
@@ -90,5 +96,6 @@ namespace Game
 
         /// <summary>Velocidad inicial necesaria para alcanzar jumpHeight con la gravedad de subida.</summary>
         public float JumpVelocity => Mathf.Sqrt(2f * Mathf.Abs(Physics2D.gravity.y) * riseGravityScale * jumpHeight);
+        public float AirJumpVelocity => Mathf.Sqrt(2f * Mathf.Abs(Physics2D.gravity.y) * riseGravityScale * airJumpHeight);
     }
 }

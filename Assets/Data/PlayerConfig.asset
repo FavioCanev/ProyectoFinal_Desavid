@@ -20,6 +20,8 @@ MonoBehaviour:
   fallGravityScale: 5
   jumpCutGravityMultiplier: 3
   maxFallSpeed: 22
+  airJumps: 1
+  airJumpHeight: 2.6
   coyoteTime: 0.1
   jumpBufferTime: 0.12
   dashSpeed: 18

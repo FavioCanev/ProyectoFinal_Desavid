@@ -18,6 +18,10 @@ namespace Game
 
         public static RunState Run { get; private set; } = new RunState();
 
+        // El proyecto entra en Play sin recargar el dominio: sin esto, vidas y monedas pasarían de una prueba a otra.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetForPlayMode() => Run = new RunState();
+
         public static bool IsLastLevel(string scene) => Array.IndexOf(Levels, scene) == Levels.Length - 1;
 
         /// <summary>Siguiente nivel tras el dado, o null si es el último.</summary>

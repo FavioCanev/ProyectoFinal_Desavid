@@ -10,6 +10,21 @@ namespace Game.Tests
     public class GameFlowPlayTests
     {
         [UnityTest]
+        public IEnumerator Intro_PlaysTheVideo_OrGoesToTheMenu()
+        {
+            SceneManager.LoadScene(GameFlow.IntroScene);
+            yield return null;
+            var video = Object.FindFirstObjectByType<UnityEngine.Video.VideoPlayer>();
+            bool ok = false;
+            for (float t = 0f; t < 8f && !ok; t += Time.unscaledDeltaTime)
+            {
+                ok = SceneManager.GetActiveScene().name == GameFlow.MenuScene || video != null && video.isPlaying;
+                yield return null;
+            }
+            Assert.IsTrue(ok, "La intro no reprodujo el video ni pasó al menú: se quedaría la pantalla en negro.");
+        }
+
+        [UnityTest]
         public IEnumerator Menu_Play_StartsANewGameAtLevel1()
         {
             GameFlow.Run.AddCoins(7);

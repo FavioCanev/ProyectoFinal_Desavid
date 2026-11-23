@@ -248,6 +248,31 @@ namespace Game.Tests
             Assert.IsTrue(Object.FindFirstObjectByType<GameOverScreen>().IsShowing, "No apareció la pantalla de Game Over.");
         }
 
+        [UnityTest]
+        public IEnumerator DoubleJump_ReachesHigherThanASingleJump()
+        {
+            IEnumerator Peak(bool doubleJump, System.Action<float> result)
+            {
+                player.Teleport(Level3Layout.OnSurface(Level3Layout.PlayerStart));
+                yield return new WaitForSeconds(0.3f);
+                float floor = player.transform.position.y, peak = floor;
+                player.RequestJump(held: true);
+                for (float t = 0f; t < 1.6f; t += Time.fixedDeltaTime)
+                {
+                    if (doubleJump && t > 0.32f && t < 0.34f) player.RequestJump(held: true);   // cerca de la cima del primero
+                    peak = Mathf.Max(peak, player.transform.position.y);
+                    yield return new WaitForFixedUpdate();
+                }
+                player.ReleaseJump();
+                result(peak - floor);
+            }
+            float single = 0f, twice = 0f;
+            yield return Peak(false, h => single = h);
+            yield return Peak(true, h => twice = h);
+            Assert.Greater(single, 2.5f, $"El salto normal llega solo a {single:F2}.");
+            Assert.Greater(twice, single + 1.5f, $"El doble salto ({twice:F2}) no llega claramente más alto que uno solo ({single:F2}).");
+        }
+
         private EnemyController Nearest(System.Func<EnemyController, bool> filter) =>
             Object.FindObjectsByType<EnemyController>(FindObjectsSortMode.None)
                 .Where(filter)

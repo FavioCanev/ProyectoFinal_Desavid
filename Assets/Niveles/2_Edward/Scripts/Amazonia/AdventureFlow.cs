@@ -15,6 +15,9 @@ namespace Amazonia
     {
         public static AdventureFlow Instance { get; private set; }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetForPlayMode() => Instance = null;   // el proyecto entra en Play sin recargar el dominio
+
         public PlayerController player;
         public AdventureBoss boss;
         [Tooltip("Texto de pista en pantalla (\"[E] SUMERGIRSE\"...).")]

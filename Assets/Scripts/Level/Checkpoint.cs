@@ -20,6 +20,10 @@ namespace Game
         /// <summary>Se dispara la primera vez que se activa cualquier punto de control (para el aviso del HUD).</summary>
         public static event Action Activated;
 
+        // Sin recarga de dominio, los suscriptores de una prueba anterior seguirían aquí.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetForPlayMode() => Activated = null;
+
         public bool IsActive { get; private set; }
 
         private void OnTriggerEnter2D(Collider2D other)

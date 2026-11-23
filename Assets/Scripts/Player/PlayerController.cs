@@ -69,7 +69,7 @@ namespace Game
             rb = GetComponent<Rigidbody2D>();
             body = GetComponent<CapsuleCollider2D>();
             controls = new PlayerControls();
-            jumpAssist = new JumpAssist(config.coyoteTime, config.jumpBufferTime);
+            jumpAssist = new JumpAssist(config.coyoteTime, config.jumpBufferTime, config.airJumps);
             dash = new DashAbility(config.dashDuration, config.dashCooldown, config.airDashes);
             shoot = controls.asset.FindAction("Gameplay/Shoot", throwIfNotFound: true);
         }
@@ -85,7 +85,7 @@ namespace Game
             moveInput = ControlsEnabled && Mathf.Abs(move.x) > 0.2f ? Mathf.Sign(move.x) : 0f;
 
             if (ControlsEnabled && controls.Gameplay.Jump.WasPressedThisFrame()) jumpPressedSinceLastStep = true;
-            jumpHeld = controls.Gameplay.Jump.IsPressed();
+            jumpHeld = controls.Gameplay.Jump.IsPressed() || jumpHeldByCode;
             if (ControlsEnabled && controls.Gameplay.Attack.WasPressedThisFrame()) AttackPressed?.Invoke();
             if (ControlsEnabled && controls.Gameplay.Dash.WasPressedThisFrame()) dashPressedSinceLastStep = true;
             if (ControlsEnabled && shoot.WasPressedThisFrame()) ShootPressed?.Invoke();
@@ -157,6 +157,12 @@ namespace Game
                 bouncing = false;
                 Jumped?.Invoke();
             }
+            else if (knockbackLeft <= 0f && jumpAssist.TryConsumeAirJump())
+            {
+                v.y = config.AirJumpVelocity;   // doble salto
+                bouncing = false;
+                Jumped?.Invoke();
+            }
 
             if (v.y <= 0f) bouncing = false;
             rb.gravityScale = GravityScaleFor(v.y);
@@ -177,6 +183,17 @@ namespace Game
             rb.linearVelocity = Vector2.MoveTowards(v, target, config.swimAcceleration * dt);
         }
 
+        private bool jumpHeldByCode;
+
+        /// <summary>Pulsa saltar como si se apretara Espacio (lo usan las pruebas). "held": mantenerlo apretado.</summary>
+        public void RequestJump(bool held)
+        {
+            jumpPressedSinceLastStep = true;
+            jumpHeldByCode = held;
+        }
+
+        public void ReleaseJump() => jumpHeldByCode = false;
+
         /// <summary>Pide un dash como si se pulsara Shift (lo usan las pruebas).</summary>
         public void RequestDash() => dashPressedSinceLastStep = true;
 
@@ -185,6 +202,7 @@ namespace Game
         {
             pendingVerticalVelocity = verticalVelocity;
             bouncing = true;
+            jumpAssist.RefillAirJumps();
         }
 
         /// <summary>Empuja al jugador y le quita el control horizontal durante un momento.</summary>
