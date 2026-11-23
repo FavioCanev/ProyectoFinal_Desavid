@@ -216,7 +216,12 @@ public static class EnemyAssetsBuilder
         return prefab;
     }
 
-    private static Projectile EnsureProjectile(string name, Sprite circle, Vector2 visualSize, float radius, float gravity, bool destroyOnGround, float lifetime)
+    private static Projectile EnsureProjectile(string name, Sprite circle, Vector2 visualSize, float radius, float gravity, bool destroyOnGround, float lifetime) =>
+        EnsureProjectile(Level3Prefabs, name, circle, visualSize, AcidGreen, radius, gravity, destroyOnGround, lifetime);
+
+    /// <summary>Proyectil enemigo: escupitajo, onda de choque, fuego o dinamita (si explosionRadius > 0).</summary>
+    public static Projectile EnsureProjectile(string folder, string name, Sprite sprite, Vector2 visualSize, Color color, float radius, float gravity,
+        bool destroyOnGround, float lifetime, float explosionRadius = 0f, float spin = 0f)
     {
         var go = new GameObject(name);
         var rb = go.AddComponent<Rigidbody2D>();
@@ -232,16 +237,19 @@ public static class EnemyAssetsBuilder
         visual.transform.localPosition = col.offset;
         visual.transform.localScale = new Vector3(visualSize.x, visualSize.y, 1f);
         var sr = visual.AddComponent<SpriteRenderer>();
-        sr.sprite = circle;
-        sr.color = AcidGreen;
+        sr.sprite = sprite;
+        sr.color = color;
         sr.sortingOrder = 15;
 
         var p = go.AddComponent<Projectile>();
         TestRoomBuilder.Set(p, "destroyOnGround", destroyOnGround);
         TestRoomBuilder.Set(p, "lifetime", lifetime);
+        TestRoomBuilder.Set(p, "explosionRadius", explosionRadius);
+        TestRoomBuilder.Set(p, "spin", spin);
         TestRoomBuilder.SetMask(p, "groundMask", LayerMask.GetMask("Ground"));
 
-        var prefab = PrefabUtility.SaveAsPrefabAsset(go, $"{Level3Prefabs}/{name}.prefab");
+        TestRoomBuilder.EnsureFolder(folder);
+        var prefab = PrefabUtility.SaveAsPrefabAsset(go, $"{folder}/{name}.prefab");
         UnityEngine.Object.DestroyImmediate(go);
         return prefab.GetComponent<Projectile>();
     }

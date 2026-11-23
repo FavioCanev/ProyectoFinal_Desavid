@@ -14,7 +14,7 @@ namespace Game
         public const string MenuScene = "Menu";
 
         /// <summary>Niveles en orden de juego. Nivel2_Lago se alcanza zambulléndose desde Nivel2_Tierra.</summary>
-        public static readonly string[] Levels = { "Nivel1", "Nivel2_Tierra", "Nivel2_Lago", "Nivel3" };
+        public static readonly string[] Levels = { "Nivel1", "Nivel2_Tierra", "Nivel2_Lago", "Nivel3", "Nivel4", "Nivel5" };
 
         public static RunState Run { get; private set; } = new RunState();
 

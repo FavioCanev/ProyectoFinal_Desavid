@@ -297,80 +297,15 @@ public static class Level2Builder
                 TestRoomBuilder.ConfigureSprite(AssetDatabase.GUIDToAssetPath(guid), new Vector2(0.5f, 0.5f), FilterMode.Bilinear);
     }
 
-    // Losetas del tileset hecho con Gemini (144 px = 1,2 unidades). Claves: TL/T1/T2/TR arriba, L/R lados,
-    // F1-F3 relleno, H1-H3 relleno justo bajo la superficie (con hojas o algas), BL/B1/B2/BR abajo.
-    private const float TileSize = 1.2f;
-    private const int TilePixelsPerUnit = 120;
+    private const string TileArt = Folder + "Art/Tileset/";
 
-    private static TileBase LoadTile(string set, string key)
-    {
-        string folder = Folder + "Art/Tileset/";
-        string assetPath = $"{folder}Tiles/{set}_{key}.asset";
-        TestRoomBuilder.EnsureFolder(folder + "Tiles");
-        TestRoomBuilder.ConfigureSprite($"{folder}{set}_{key}.png", new Vector2(0.5f, 0.5f), FilterMode.Point, TilePixelsPerUnit);   // sin suavizado: no se ven costuras
-        var tile = AssetDatabase.LoadAssetAtPath<Tile>(assetPath);
-        if (tile == null) { tile = ScriptableObject.CreateInstance<Tile>(); AssetDatabase.CreateAsset(tile, assetPath); }
-        tile.sprite = AssetDatabase.LoadAssetAtPath<Sprite>($"{folder}{set}_{key}.png");
-        tile.colliderType = Tile.ColliderType.Grid;
-        EditorUtility.SetDirty(tile);
-        return tile;
-    }
+    private static void PaintTiles(string name, string set, RectInt[] blocks) => TilePainter.Paint(TileArt, set, name, blocks);
 
-    /// <summary>Pinta los bloques (en celdas) en un Tilemap con colisión, eligiendo cada loseta según sus vecinas.</summary>
-    private static void PaintTiles(string name, string set, RectInt[] blocks)
-    {
-        var grid = new GameObject("Grid " + name).AddComponent<Grid>();
-        grid.cellSize = new Vector3(TileSize, TileSize, 0f);
-        var map = GroundTilemapFactory.Create(grid.transform, name, LayerMask.NameToLayer("Ground"), sortingOrder: 1);
-        TileBase T(string key) => LoadTile(set, key);
-        TileBase[] top = { T("T1"), T("T2") }, fill = { T("F1"), T("F2"), T("F3") }, underTop = { T("H1"), T("H2"), T("H3") }, bottom = { T("B1"), T("B2") };
-        TileBase tl = T("TL"), tr = T("TR"), l = T("L"), r = T("R"), bl = T("BL"), br = T("BR");
+    /// <summary>Tronco caído (tileset de Gemini) como plataforma de un solo sentido.</summary>
+    private static void Log(Transform parent, float x, float top) =>
+        TilePainter.OneWayPlatform(parent, "Tronco", x, top, new[] { 0, 1, 2, 3 }.Select(i => $"{TileArt}tronco_{i}.png").ToArray(), pivotY: 0.78f);
 
-        var cells = new HashSet<Vector2Int>();
-        foreach (var b in blocks) foreach (var c in b.allPositionsWithin) cells.Add(c);
-        foreach (var c in cells)
-        {
-            bool hasL = cells.Contains(c + Vector2Int.left), hasR = cells.Contains(c + Vector2Int.right);
-            bool hasU = cells.Contains(c + Vector2Int.up), hasD = cells.Contains(c + Vector2Int.down);
-            int pick = Mathf.Abs(c.x * 7 + c.y * 13);   // variante fija por celda: el nivel sale igual cada vez
-            TileBase tile = !hasU ? (!hasL ? tl : !hasR ? tr : top[pick % 2])
-                          : !hasD ? (!hasL ? bl : !hasR ? br : bottom[pick % 2])
-                          : !hasL ? l : !hasR ? r
-                          : !cells.Contains(c + Vector2Int.up * 2) ? underTop[pick % 3] : fill[pick % 3];
-            map.SetTile((Vector3Int)c, tile);
-        }
-    }
-
-    /// <summary>Tronco caído de Edward como plataforma de un solo sentido (se sube desde abajo).</summary>
-    private static void Log(Transform parent, float x, float top)
-    {
-        var go = new GameObject("Tronco") { layer = LayerMask.NameToLayer("Ground") };
-        go.transform.SetParent(parent, false);
-        go.transform.position = new Vector3(x, top, 0f);
-        var box = go.AddComponent<BoxCollider2D>();
-        box.size = new Vector2(4f * TileSize - 0.2f, 0.35f);
-        box.offset = new Vector2(0f, -0.18f);
-        box.usedByEffector = true;
-        go.AddComponent<PlatformEffector2D>().surfaceArc = 160f;
-        // Cuatro piezas del tileset: extremo con rama, dos centrales y extremo hueco.
-        for (int i = 0; i < 4; i++)
-        {
-            string path = $"{Folder}Art/Tileset/tronco_{i}.png";
-            TestRoomBuilder.ConfigureSprite(path, new Vector2(0.5f, 0.78f), FilterMode.Bilinear, TilePixelsPerUnit);   // la corteza a la altura del borde
-            LevelKit.SpriteChild(go.transform, AssetDatabase.LoadAssetAtPath<Sprite>(path), new Vector2((i - 1.5f) * TileSize, 0f), 1f, order: 1);
-        }
-    }
-
-    private static void Void(Transform parent, float x0, float x1)
-    {
-        var go = new GameObject("Vacío");
-        go.transform.SetParent(parent, false);
-        go.transform.position = new Vector2((x0 + x1) * 0.5f, Floor - 9f);
-        var box = go.AddComponent<BoxCollider2D>();
-        box.isTrigger = true;
-        box.size = new Vector2(x1 - x0, 4f);
-        go.AddComponent<KillZone>();
-    }
+    private static void Void(Transform parent, float x0, float x1) => TilePainter.Void(parent, x0, x1, Floor - 9f);
 
     /// <summary>Pieza suelta de Edward (pivote abajo al centro). Colgada: se gira para que cuelgue desde "at".</summary>
     private static void Decor(Transform parent, Sprite sprite, Vector2 at, float scale, int order, bool hanging = false)

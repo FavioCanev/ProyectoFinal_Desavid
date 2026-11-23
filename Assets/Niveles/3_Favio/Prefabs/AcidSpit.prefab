@@ -116,6 +116,8 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 64
+  explosionRadius: 0
+  spin: 0
 --- !u!1 &5484264855032200461
 GameObject:
   m_ObjectHideFlags: 0

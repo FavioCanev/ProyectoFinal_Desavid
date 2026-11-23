@@ -456,7 +456,7 @@ public static class LevelKit
             "Assets/Scenes/Intro.unity", "Assets/Scenes/Menu.unity",
             "Assets/Niveles/1_Dante/Nivel1.unity",
             "Assets/Niveles/2_Edward/Nivel2_Tierra.unity", "Assets/Niveles/2_Edward/Nivel2_Lago.unity",
-            Level3Builder.ScenePath, TestRoomBuilder.TestRoomPath,
+            Level3Builder.ScenePath, Level45Builder.Level4Path, Level45Builder.Level5Path, TestRoomBuilder.TestRoomPath,
         };
         EditorBuildSettings.scenes = paths.Select(p => new EditorBuildSettingsScene(p, true)).ToArray();
     }

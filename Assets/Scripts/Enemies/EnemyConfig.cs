@@ -30,6 +30,8 @@ namespace Game
         [Min(0f)] public float attackPause = 0.4f;
         [Tooltip("Color del aviso antes de atacar.")]
         public Color windupColor = new Color(1f, 0.35f, 0.3f);
+        [Tooltip("Furia: con la mitad de la vida o menos, los avisos y descansos duran esta fracción (1 = sin furia).")]
+        [Range(0.3f, 1f)] public float enragedTimeScale = 1f;
         public SwipeAttack swipe = new SwipeAttack();
         public ChargeAttack charge = new ChargeAttack();
         public SpitAttack spit = new SpitAttack();

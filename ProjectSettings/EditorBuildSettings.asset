@@ -24,6 +24,12 @@ EditorBuildSettings:
     path: Assets/Niveles/3_Favio/Nivel3.unity
     guid: e9eb56a7ea962da46af5d36f1fbc67d6
   - enabled: 1
+    path: Assets/Niveles/4_Minertown/Nivel4.unity
+    guid: 94a5961292ac9324b959962d4c03fd0b
+  - enabled: 1
+    path: Assets/Niveles/5_Mansion/Nivel5.unity
+    guid: 56b8f1b8762575c488a3017eeb805886
+  - enabled: 1
     path: Assets/Scenes/SalaDePruebas.unity
     guid: 206a9523ba75997429cad5f27dc0655f
   m_configObjects:

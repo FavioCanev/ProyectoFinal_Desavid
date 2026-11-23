@@ -41,8 +41,9 @@ namespace Game.Tests
         {
             Assert.AreEqual("Nivel2_Tierra", GameFlow.NextLevel("Nivel1"));
             Assert.AreEqual("Nivel3", GameFlow.NextLevel("Nivel2_Lago"));
-            Assert.IsNull(GameFlow.NextLevel("Nivel3"));
-            Assert.IsTrue(GameFlow.IsLastLevel("Nivel3"));
+            Assert.AreEqual("Nivel4", GameFlow.NextLevel("Nivel3"));
+            Assert.IsNull(GameFlow.NextLevel("Nivel5"));
+            Assert.IsTrue(GameFlow.IsLastLevel("Nivel5"));
         }
     }
 }

@@ -218,8 +218,8 @@ namespace Game
             attackDir = dir;
             AttackTimings t = Timings(attack);
             state = State.Windup;
-            stateUntil = Time.time + t.windup;
-            readyAt[attack] = Time.time + t.cooldown;
+            stateUntil = Time.time + Pace(t.windup);
+            readyAt[attack] = Time.time + Pace(t.cooldown);
             Play("Windup");
             AttackStarted?.Invoke(attack);
         }
@@ -277,9 +277,13 @@ namespace Game
             if (current != EnemyAttack.Leap) Play("Idle");
             Halt();
             state = State.Recover;
-            stateUntil = Time.time + time;
-            nextAttackAt = stateUntil + config.attackPause;
+            stateUntil = Time.time + Pace(time);
+            nextAttackAt = stateUntil + Pace(config.attackPause);
         }
+
+        /// <summary>Con furia (mitad de vida o menos, si la configuración la tiene), todo va más rápido.</summary>
+        public bool Enraged => config.enragedTimeScale < 1f && Health.Current <= Health.Max / 2;
+        private float Pace(float seconds) => Enraged ? seconds * config.enragedTimeScale : seconds;
 
         private void HitPlayer(Vector2 offset, Vector2 size)
         {

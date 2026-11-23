@@ -81,7 +81,7 @@ public static class Level3Builder
         FeelAssetsBuilder.CreateSpores(cam.transform);
 
         LevelKit.Hud hud = LevelKit.CreateHud(player.GetComponent<PlayerController>(), LevelTitle,
-            "¡Juego completado!", "Venciste al Gran Cocodrilo\ny salvaste el pantano.\n\n<size=28>Volviendo al menú...</size>",
+            "¡Nivel completado!", "Venciste al Gran Cocodrilo.\nLas huellas de la maquinaria\nllevan a la ciudad...\n\n<size=28>Siguiente: Minertown</size>",
             "GRAN COCODRILO", boss.GetComponent<Health>());
         FeelAssetsBuilder.CreateGameFeel(hud.DamageFlash);
         GameObject goal = LevelKit.CreateGoal(objects, Level3Layout.OnSurface(Level3Layout.Goal), hud.CompletedMessage);
