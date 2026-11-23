@@ -43,6 +43,14 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 256
+  swimSpeed: 5.3
+  swimAcceleration: 24
+  sinkSpeed: 0.6
+  plasmaCapacity: 3
+  plasmaReloadTime: 6
+  plasmaCooldown: 0.42
+  plasmaSpeed: 16
+  plasmaDamage: 1
   knockbackVelocity: {x: 6, y: 7}
   knockbackTime: 0.2
   respawnDelay: 1.2

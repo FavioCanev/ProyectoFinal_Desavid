@@ -67,6 +67,19 @@ namespace Game
         public Vector2 downHitSize = new Vector2(1.2f, 1.2f);
         public LayerMask enemyMask;
 
+        [Header("Nado (dentro de un WaterVolume)")]
+        [Min(0f)] public float swimSpeed = 5.3f;
+        [Min(0f)] public float swimAcceleration = 24f;
+        [Tooltip("Velocidad a la que se hunde sin pulsar arriba/abajo.")]
+        [Min(0f)] public float sinkSpeed = 0.6f;
+
+        [Header("Plasma (tecla Fin; se consigue en el nivel 2)")]
+        [Min(1)] public int plasmaCapacity = 3;
+        [Min(0f)] public float plasmaReloadTime = 6f;
+        [Min(0f)] public float plasmaCooldown = 0.42f;
+        [Min(0f)] public float plasmaSpeed = 16f;
+        [Min(1)] public int plasmaDamage = 1;
+
         [Header("Daño recibido")]
         [Tooltip("Empujón al recibir un golpe: X se aleja del enemigo, Y hacia arriba.")]
         public Vector2 knockbackVelocity = new Vector2(6f, 7f);

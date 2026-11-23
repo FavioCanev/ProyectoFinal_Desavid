@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Game
@@ -9,8 +8,6 @@ namespace Game
     /// <summary>Menú de pausa con Esc: Continuar, Reiniciar nivel y Menú principal (si existe esa escena).</summary>
     public class PauseMenu : MonoBehaviour
     {
-        public const string MainMenuScene = "Menu";
-
         [Tooltip("Se desactiva mientras dura la pausa para que no lea las teclas.")]
         [SerializeField] private PlayerController player;
         [SerializeField] private GameObject panel;
@@ -25,8 +22,8 @@ namespace Game
             panel.SetActive(false);
             resumeButton.onClick.AddListener(() => SetPaused(false));
             restartButton.onClick.AddListener(Restart);
-            menuButton.onClick.AddListener(() => Load(MainMenuScene));
-            menuButton.gameObject.SetActive(Application.CanStreamedLevelBeLoaded(MainMenuScene));
+            menuButton.onClick.AddListener(() => { SetPaused(false); GameFlow.GoToMenu(); });
+            menuButton.gameObject.SetActive(Application.CanStreamedLevelBeLoaded(GameFlow.MenuScene));
         }
 
         private void Update()
@@ -46,12 +43,10 @@ namespace Game
             if (paused && EventSystem.current != null) EventSystem.current.SetSelectedGameObject(resumeButton.gameObject);
         }
 
-        private void Restart() => Load(SceneManager.GetActiveScene().name);
-
-        private void Load(string scene)
+        private void Restart()
         {
             SetPaused(false);
-            SceneManager.LoadScene(scene);
+            GameFlow.RestartLevel();
         }
 
         private void OnDestroy()

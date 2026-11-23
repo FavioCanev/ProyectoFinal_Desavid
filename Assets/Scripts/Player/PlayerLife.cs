@@ -19,7 +19,12 @@ namespace Game
         /// <summary>Al caer en el ácido o al vacío.</summary>
         public event System.Action HazardTouched;
 
+        /// <summary>Murió sin vidas de reserva: la partida terminó.</summary>
+        public event System.Action GameOver;
+
         public Vector2 Checkpoint { get; private set; }
+        /// <summary>No recibe daño normal (por ejemplo, durante una cinemática).</summary>
+        public bool Protected { get; set; }
         public Health Health => health;
 
         private PlayerConfig Config => controller.Config;
@@ -29,7 +34,8 @@ namespace Game
             controller = GetComponent<PlayerController>();
             health = GetComponent<Health>();
             Checkpoint = transform.position;
-            health.Shielded = () => controller.IsDashing;   // el dash atraviesa enemigos y proyectiles; el ácido daña igual
+            // El dash atraviesa enemigos y proyectiles (el ácido daña igual); Protected, durante cinemáticas.
+            health.Shielded = () => controller.IsDashing || Protected;
             health.Damaged += OnDamaged;
             health.Died += OnDied;
         }
@@ -86,7 +92,8 @@ namespace Game
         private void OnDied()
         {
             controller.ControlsEnabled = false;
-            respawnAt = Time.time + Config.respawnDelay;
+            if (GameFlow.Run.TryUseLife()) respawnAt = Time.time + Config.respawnDelay;
+            else GameOver?.Invoke();
         }
 
         private void Respawn()

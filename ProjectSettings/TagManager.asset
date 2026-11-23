@@ -38,6 +38,24 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 51701
+    locked: 0
+  - name: EnvironmentBack
+    uniqueID: 51702
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Characters
+    uniqueID: 51703
+    locked: 0
+  - name: EnvironmentFront
+    uniqueID: 51704
+    locked: 0
+  - name: Effects
+    uniqueID: 51705
+    locked: 0
+  - name: UI
+    uniqueID: 51706
     locked: 0

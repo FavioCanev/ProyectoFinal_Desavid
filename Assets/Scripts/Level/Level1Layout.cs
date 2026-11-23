@@ -3,124 +3,80 @@ using UnityEngine;
 namespace Game
 {
     /// <summary>
-    /// Trazado del Nivel 1 en celdas de la cuadrícula (0,45 unidades). Lo usan el constructor y las pruebas.
-    /// Fila y = 0 es el suelo inicial (borde superior en y = 0,45).
-    /// Medidas del jugador (ver PlayerConfig): salta unas 6,7 filas de alto y unas 14 columnas de largo;
-    /// con dash en el aire, unas 21 columnas. Los huecos "de dash" miden 17: imposibles sin dash, con margen.
+    /// Trazado del Nivel 1 (bosque de Dante) en celdas de SU mapa de losetas (cada celda mide 1,11 unidades).
+    /// Las columnas -38 a 36 son el tramo original de Dante (se conserva tal cual); de la 40 en adelante, la ampliación.
+    /// Es el nivel tutorial: enseña cada control con un cartel justo antes de necesitarlo.
+    /// Medidas del jugador en celdas de este mapa: salta unas 2,7 de alto y 5,7 de largo; con dash en el aire, unas 8,5.
     /// </summary>
     public static class Level1Layout
     {
-        public const float Cell = 0.45f;
+        public const float CellWorld = 1.11f;
 
-        public enum Kind { Earth, Metal, Beam }
-        public enum EnemyType { Warrior, Spitter, Boss }
-
+        /// <summary>Bloque de tierra (columnas X0-X1, filas Y0-Y1). La fila Y1 es la superficie.</summary>
         public readonly struct Block
         {
             public readonly int X0, X1, Y0, Y1;
-            public readonly Kind Kind;
-            public Block(int x0, int x1, int y0, int y1, Kind kind) { X0 = x0; X1 = x1; Y0 = y0; Y1 = y1; Kind = kind; }
+            public Block(int x0, int x1, int y0, int y1) { X0 = x0; X1 = x1; Y0 = y0; Y1 = y1; }
         }
 
-        public readonly struct Spawn
-        {
-            public readonly EnemyType Type;
-            public readonly Vector2Int Cell;
-            public Spawn(EnemyType type, int x, int y) { Type = type; Cell = new Vector2Int(x, y); }
-        }
-
-        /// <summary>Plataforma móvil: va de (FromX, FromRow) a (ToX, ToRow); X es la columna central.</summary>
-        public readonly struct Mover
-        {
-            public readonly int FromX, FromRow, ToX, ToRow, Width;
-            public Mover(int fromX, int fromRow, int toX, int toRow, int width = 4) { FromX = fromX; FromRow = fromRow; ToX = toX; ToRow = toRow; Width = width; }
-        }
+        public const int Bottom = -20;   // fondo de los bloques de tierra; más abajo está el vacío
 
         public static readonly Block[] Blocks =
         {
-            new Block(-14, -11, -8, 34, Kind.Earth),   // pared izquierda
-            // Tramo 1: inicio y primer hueco de dash (31-47, 17 columnas)
-            new Block(-10, 30, -8, 0, Kind.Earth),
-            // Tramo 2: guerreros
-            new Block(48, 100, -8, 0, Kind.Earth),
-            new Block(74, 79, 5, 5, Kind.Metal),       // refugio para esquivar embestidas (se puede pasar por debajo)
-            new Block(110, 165, -8, 0, Kind.Earth),    // tras un foso de ácido (101-109)
-            new Block(136, 138, 1, 3, Kind.Earth),     // obstáculo
-            // Tramo 3: torre en zigzag hasta el acantilado (escupidor arriba)
-            // Las plataformas más bajas van en la fila 5: el jugador (unas 4,6 filas de alto) cabe por debajo.
-            new Block(152, 156, 5, 5, Kind.Metal),
-            new Block(159, 163, 9, 9, Kind.Metal),
-            new Block(152, 156, 13, 13, Kind.Metal),
-            new Block(159, 163, 17, 17, Kind.Metal),
-            new Block(166, 200, -8, 20, Kind.Earth),   // acantilado
-            // Tramo 4: vigas sobre el ácido y segundo hueco de dash (218-234)
-            new Block(205, 208, 21, 21, Kind.Beam),
-            new Block(214, 217, 21, 21, Kind.Beam),
-            new Block(235, 262, 14, 20, Kind.Earth),   // saliente flotante
-            // Tramo 5: plataformas móviles (ver Movers) hasta otra saliente
-            new Block(318, 345, -1, 4, Kind.Earth),
-            // Tramo 6: arena del jefe (como en Hollow Knight: suelo amplio para esquivar, con alturas para escapar).
-            // Repisas de 3 filas en los costados; el jefe (3,2 de alto) cabe bajo las plataformas de la fila 9,
-            // que se alcanzan saltando desde las repisas. La plataforma central (fila 13) se alcanza desde ellas.
-            new Block(346, 420, -8, 0, Kind.Earth),
-            new Block(354, 359, 1, 3, Kind.Earth),      // repisa izquierda
-            new Block(412, 420, 1, 3, Kind.Earth),      // repisa derecha (la meta aparece aquí)
-            new Block(363, 368, 9, 9, Kind.Metal),
-            new Block(381, 392, 13, 13, Kind.Metal),
-            new Block(405, 410, 9, 9, Kind.Metal),
-            new Block(421, 424, -8, 34, Kind.Earth),   // pared derecha
+            // Tramo 2: escuela de dash (el hueco 48-54 mide 7 celdas = 7,8 unidades: imposible sin dash)
+            new Block(40, 47, Bottom, -5),
+            new Block(55, 72, Bottom, -5),
+            // Tramo 3: escalera de plataformas sobre el vacío hasta la meseta
+            new Block(75, 78, -3, -3),
+            new Block(80, 83, -1, -1),
+            new Block(85, 88, 1, 1),
+            new Block(91, 104, Bottom, 1),
+            // Tramo 4: bajada al claro de los leñadores (rebote sobre ellos) y final
+            new Block(107, 148, Bottom, -6),
+            new Block(114, 117, -2, -2),          // plataforma con monedas (se pasa por debajo)
+            new Block(149, 152, Bottom, 8),       // pared final
         };
 
-        public static readonly Mover[] Movers =
+        /// <summary>Leñadores (columna, fila de la superficie donde se apoyan).</summary>
+        public static readonly Vector2Int[] Enemies =
         {
-            new Mover(268, 18, 282, 18, 5),   // horizontal
-            new Mover(289, 18, 289, 4, 5),    // vertical (baja hasta cerca del ácido)
-            new Mover(297, 4, 312, 4, 5),     // horizontal, justo sobre el ácido
+            new Vector2Int(10, -8), new Vector2Int(64, -5), new Vector2Int(99, 1),
+            new Vector2Int(112, -6), new Vector2Int(121, -6), new Vector2Int(133, -6),
         };
 
-        public static readonly Spawn[] Enemies =
-        {
-            new Spawn(EnemyType.Warrior, 68, 0),
-            new Spawn(EnemyType.Warrior, 88, 0),
-            new Spawn(EnemyType.Warrior, 128, 0),
-            new Spawn(EnemyType.Spitter, 182, 20),
-            new Spawn(EnemyType.Warrior, 244, 20),
-            new Spawn(EnemyType.Spitter, 258, 20),
-            new Spawn(EnemyType.Warrior, 335, 4),
-        };
-
-        public static readonly Vector2Int PlayerStart = new Vector2Int(-6, 0);
+        public static readonly Vector2Int PlayerStart = new Vector2Int(-23, -11);
         public static readonly Vector2Int[] Checkpoints =
         {
-            new Vector2Int(51, 0), new Vector2Int(113, 0), new Vector2Int(168, 20),
-            new Vector2Int(237, 20), new Vector2Int(320, 4), new Vector2Int(347, 0),
+            new Vector2Int(-3, -9), new Vector2Int(41, -5), new Vector2Int(92, 1), new Vector2Int(108, -6),
         };
 
-        // Arena del jefe
-        public static readonly Vector2Int BossSpawn = new Vector2Int(396, 0);
-        public static readonly Vector2Int Goal = new Vector2Int(416, 3);
-        /// <summary>Al entrar en estas columnas empieza la pelea.</summary>
-        public static readonly RectInt ArenaTrigger = new RectInt(356, 1, 62, 14);
-        /// <summary>Puerta que se cierra detrás del jugador durante la pelea.</summary>
-        public static readonly RectInt ArenaDoor = new RectInt(350, 1, 2, 12);
+        public static readonly (Vector2Int Cell, int Count)[] CoinRows =
+        {
+            (new Vector2Int(-30, -11), 3), (new Vector2Int(-11, -10), 2), (new Vector2Int(3, -9), 3), (new Vector2Int(4, -2), 3),
+            (new Vector2Int(31, -5), 3), (new Vector2Int(49, -3), 5), (new Vector2Int(58, -5), 4), (new Vector2Int(75, -3), 3),
+            (new Vector2Int(80, -1), 3), (new Vector2Int(85, 1), 3), (new Vector2Int(95, 1), 4), (new Vector2Int(114, -2), 4),
+            (new Vector2Int(125, -6), 4), (new Vector2Int(138, -6), 3),
+        };
 
-        /// <summary>Superficie del ácido: caer por debajo cuesta una máscara.</summary>
-        public const int AcidTopRow = -2;
-        public const int AcidBottomRow = -12;
+        /// <summary>Carteles del tutorial: cada control justo antes de necesitarlo.</summary>
+        public static readonly (Vector2Int Cell, string Text)[] Signs =
+        {
+            (new Vector2Int(-33, -11), "Mover: A/D o ←/→\nSaltar: Espacio"),
+            (new Vector2Int(-19, -11), "Junta monedas: valen\nen todo el juego"),
+            (new Vector2Int(0, -9), "Las banderas guardan\ntu avance (3 vidas)"),
+            (new Vector2Int(44, -5), "Shift: dash\n(también en el aire)"),
+            (new Vector2Int(57, -5), "} o Supr: atacar\n↑ + ataque: hacia arriba"),
+            (new Vector2Int(101, 1), "En el aire: ↓ + ataque\nsobre un enemigo = rebote"),
+            (new Vector2Int(127, -6), "Fin: plasma (desde el nivel 2)\nE: zambullirse · Esc: pausa"),
+        };
 
-        /// <summary>Un punto en el aire sobre el primer hueco de ácido (para las pruebas).</summary>
-        public static readonly Vector2Int PitProbe = new Vector2Int(38, 3);
+        public static readonly Vector2Int Goal = new Vector2Int(145, -6);
+        /// <summary>Robot gigante de Dante: decorado junto a la meta.</summary>
+        public static readonly Vector2Int RobotDecor = new Vector2Int(140, -6);
 
         /// <summary>Rectángulo que la cámara no puede abandonar (en celdas).</summary>
-        public static readonly RectInt CameraBounds = new RectInt(-14, -4, 439, 38);
-
-        /// <summary>Punto apoyado sobre la superficie de la celda (para colocar personajes y objetos).</summary>
-        public static Vector2 OnSurface(Vector2Int c) => new Vector2((c.x + 0.5f) * Cell, (c.y + 1) * Cell);
-
-        public static Vector2 ToWorld(RectInt cells, out Vector2 size)
-        {
-            size = new Vector2(cells.width, cells.height) * Cell;
-            return new Vector2(cells.x * Cell, cells.y * Cell) + size * 0.5f;
-        }
+        public static readonly RectInt CameraBounds = new RectInt(-38, -17, 191, 30);
+        /// <summary>Caer por debajo de esta fila cuesta un corazón y devuelve a la última bandera.</summary>
+        public const int VoidRow = -19;
     }
 }

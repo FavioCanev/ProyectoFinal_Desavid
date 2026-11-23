@@ -6,7 +6,22 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Nivel1.unity
+    path: Assets/Scenes/Intro.unity
+    guid: de9643223e8fb9b46a92c00716e529ad
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: 96504a2b872fef84f979bd3ee5452cf1
+  - enabled: 1
+    path: Assets/Niveles/1_Dante/Nivel1.unity
+    guid: 107e12d57367f7544989a50ecd677ef3
+  - enabled: 1
+    path: Assets/Niveles/2_Edward/Nivel2_Tierra.unity
+    guid: a96d7ad64a39f734d8660a6c5cb3dd7b
+  - enabled: 1
+    path: Assets/Niveles/2_Edward/Nivel2_Lago.unity
+    guid: 1a7e92dc88451e84297bf37a821dd7fc
+  - enabled: 1
+    path: Assets/Niveles/3_Favio/Nivel3.unity
     guid: e9eb56a7ea962da46af5d36f1fbc67d6
   - enabled: 1
     path: Assets/Scenes/SalaDePruebas.unity

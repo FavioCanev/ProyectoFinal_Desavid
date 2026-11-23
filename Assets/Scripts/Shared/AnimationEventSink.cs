@@ -10,5 +10,6 @@ namespace Game
     {
         public void StopAttack() { }
         public void StopDamage() { }
+        public void DestroyBody() { }
     }
 }

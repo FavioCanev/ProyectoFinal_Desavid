@@ -14,15 +14,17 @@ public static class EnemyAssetsBuilder
     public struct Prefabs
     {
         public GameObject Warrior, Spitter, Boss;
-        public GameObject For(Level1Layout.EnemyType t) =>
-            t == Level1Layout.EnemyType.Warrior ? Warrior : t == Level1Layout.EnemyType.Spitter ? Spitter : Boss;
+        public GameObject For(Level3Layout.EnemyType t) =>
+            t == Level3Layout.EnemyType.Warrior ? Warrior : t == Level3Layout.EnemyType.Spitter ? Spitter : Boss;
     }
 
-    private const string CrocFrames = "Assets/Art/Crocodile/Frames/";
-    private const string CrocClips = "Assets/Art/Crocodile/Animation/";
-    private const string BossFrames = "Assets/Art/Boss/Frames/";
-    private const string BossClips = "Assets/Art/Boss/Animation/";
+    private const string CrocFrames = "Assets/Niveles/3_Favio/Art/Crocodile/Frames/";
+    private const string CrocClips = "Assets/Niveles/3_Favio/Art/Crocodile/Animation/";
+    private const string BossFrames = "Assets/Niveles/3_Favio/Art/Boss/Frames/";
+    private const string BossClips = "Assets/Niveles/3_Favio/Art/Boss/Animation/";
     private const string Circle = "Assets/Art/Fx/circle.png";
+    private const string Level3Data = "Assets/Niveles/3_Favio/Data/Enemies";
+    private const string Level3Prefabs = "Assets/Niveles/3_Favio/Prefabs";
     // Pivotes comunes (centro del cuerpo y pies), calculados al recortar cada hoja.
     private static readonly Vector2 CrocPivot = new Vector2(0.5f, 0.0226f);
     private static readonly Vector2 BossPivot = new Vector2(0.5f, 0.0319f);
@@ -30,7 +32,7 @@ public static class EnemyAssetsBuilder
 
     public static Prefabs Prepare(PhysicsMaterial2D noFriction)
     {
-        TestRoomBuilder.EnsureFolder("Assets/Data/Enemies");
+        TestRoomBuilder.EnsureFolder(Level3Data);
         TestRoomBuilder.ConfigureSprite(Circle, new Vector2(0.5f, 0.5f), FilterMode.Bilinear, pixelsPerUnit: 64);
         Sprite circle = AssetDatabase.LoadAssetAtPath<Sprite>(Circle);
 
@@ -91,14 +93,18 @@ public static class EnemyAssetsBuilder
         c.leap.flightTime = 0.8f; c.leap.shockwaveSpeed = 8f;
     }
 
-    private static void Timings(AttackTimings t, bool enabled, float min, float max, float windup, float recover, float cooldown)
+    public static void Timings(AttackTimings t, bool enabled, float min, float max, float windup, float recover, float cooldown)
     {
         t.enabled = enabled; t.minRange = min; t.maxRange = max; t.windup = windup; t.recover = recover; t.cooldown = cooldown;
     }
 
-    private static EnemyConfig Config(string name, Action<EnemyConfig> setup)
+    private static EnemyConfig Config(string name, Action<EnemyConfig> setup) => Config(Level3Data, name, setup);
+
+    /// <summary>Crea o actualiza la configuración "{name}Config" en la carpeta dada.</summary>
+    public static EnemyConfig Config(string folder, string name, Action<EnemyConfig> setup)
     {
-        string path = $"Assets/Data/Enemies/{name}Config.asset";
+        TestRoomBuilder.EnsureFolder(folder);
+        string path = $"{folder}/{name}Config.asset";
         var config = AssetDatabase.LoadAssetAtPath<EnemyConfig>(path);
         if (config == null)
         {
@@ -127,7 +133,7 @@ public static class EnemyAssetsBuilder
         Clip(CrocClips, CrocFrames, "Spit", Row(2, 3, 5), 12f, false);
         Clip(CrocClips, CrocFrames, "Hurt", new[] { "croc_r3_00", "croc_r3_02" }, 8f, true);
         Clip(CrocClips, CrocFrames, "Dead", Row(3, 3, 5), 8f, false);
-        return States("Assets/Data/Enemies/CrocodileAnimator.controller", CrocClips, "Walk", "Idle", "Windup", "Swipe", "Charge", "Spit", "Hurt", "Dead");
+        return States("Assets/Niveles/3_Favio/Data/Enemies/CrocodileAnimator.controller", CrocClips, "Walk", "Idle", "Windup", "Swipe", "Charge", "Spit", "Hurt", "Dead");
     }
 
     private static AnimatorController BossAnimator()
@@ -144,7 +150,7 @@ public static class EnemyAssetsBuilder
         Clip(BossClips, BossFrames, "Slam", Row(2, 5, 6), 10f, false);
         Clip(BossClips, BossFrames, "Hurt", Row(3, 0, 2), 10f, true);
         Clip(BossClips, BossFrames, "Dead", Row(3, 3, 5), 6f, false);
-        return States("Assets/Data/Enemies/BossAnimator.controller", BossClips, "Walk", "Idle", "Windup", "Swipe", "Charge", "Spit", "Leap", "Slam", "Hurt", "Dead");
+        return States("Assets/Niveles/3_Favio/Data/Enemies/BossAnimator.controller", BossClips, "Walk", "Idle", "Windup", "Swipe", "Charge", "Spit", "Leap", "Slam", "Hurt", "Dead");
     }
 
     private static void ImportFrames(string folder, Vector2 pivot)
@@ -162,7 +168,13 @@ public static class EnemyAssetsBuilder
     // ---------- Prefabs ----------
 
     private static GameObject EnsureEnemy(string name, EnemyConfig config, Sprite sprite, AnimatorController animatorController,
-        PhysicsMaterial2D noFriction, Projectile spit, Projectile wave, float scale, Vector2 collider, Color tint, int health, bool dormant)
+        PhysicsMaterial2D noFriction, Projectile spit, Projectile wave, float scale, Vector2 collider, Color tint, int health, bool dormant) =>
+        EnsureEnemy(Level3Prefabs, name, config, sprite, animatorController, noFriction, spit, wave, scale, collider, tint, health, dormant);
+
+    /// <param name="visualOffsetY">Para sprites con el pivote en el centro: sube el dibujo hasta que los pies toquen el suelo.</param>
+    public static GameObject EnsureEnemy(string folder, string name, EnemyConfig config, Sprite sprite, RuntimeAnimatorController animatorController,
+        PhysicsMaterial2D noFriction, Projectile spit, Projectile wave, float scale, Vector2 collider, Color tint, int health, bool dormant,
+        float visualOffsetY = 0f)
     {
         var go = new GameObject(name) { layer = LayerMask.NameToLayer("Enemy") };
 
@@ -180,6 +192,8 @@ public static class EnemyAssetsBuilder
 
         var visual = TestRoomBuilder.CreateVisual(go.transform, sprite, 9, scale, animatorController, out SpriteRenderer sr, out Animator animator);
         sr.color = tint;
+        visual.localPosition = new Vector3(0f, visualOffsetY, 0f);
+        visual.gameObject.AddComponent<AnimationEventSink>();   // las animaciones importadas llaman eventos propios
 
         var hp = go.AddComponent<Health>();
         TestRoomBuilder.Set(hp, "maxHealth", health);
@@ -196,7 +210,8 @@ public static class EnemyAssetsBuilder
         TestRoomBuilder.SetMask(enemy, "groundMask", LayerMask.GetMask("Ground"));
         TestRoomBuilder.SetMask(enemy, "playerMask", LayerMask.GetMask("Player"));
 
-        var prefab = PrefabUtility.SaveAsPrefabAsset(go, $"Assets/Prefabs/{name}.prefab");
+        TestRoomBuilder.EnsureFolder(folder);
+        var prefab = PrefabUtility.SaveAsPrefabAsset(go, $"{folder}/{name}.prefab");
         UnityEngine.Object.DestroyImmediate(go);
         return prefab;
     }
@@ -226,7 +241,7 @@ public static class EnemyAssetsBuilder
         TestRoomBuilder.Set(p, "lifetime", lifetime);
         TestRoomBuilder.SetMask(p, "groundMask", LayerMask.GetMask("Ground"));
 
-        var prefab = PrefabUtility.SaveAsPrefabAsset(go, $"Assets/Prefabs/{name}.prefab");
+        var prefab = PrefabUtility.SaveAsPrefabAsset(go, $"{Level3Prefabs}/{name}.prefab");
         UnityEngine.Object.DestroyImmediate(go);
         return prefab.GetComponent<Projectile>();
     }

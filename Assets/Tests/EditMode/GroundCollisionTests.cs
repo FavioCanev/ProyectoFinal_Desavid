@@ -15,7 +15,7 @@ namespace Game.Tests
     public class GroundCollisionTests
     {
         private const string ScenePath = "Assets/Tests/Temp_GroundTest.unity";
-        private const string TilePath = "Assets/Art/Terrain/terreno-removebg-preview_0.asset";
+        private const string TilePath = "Assets/Niveles/3_Favio/Art/Terrain/terreno-removebg-preview_0.asset";
 
         private SimulationMode2D previousMode;
 

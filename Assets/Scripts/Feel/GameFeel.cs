@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Game
 {
-    public enum Sfx { Jump, Land, Dash, Swing, Hit, EnemyHurt, EnemyDie, PlayerHurt, Spit, Shockwave, BossRoar, Checkpoint, Goal, Acid, Pogo }
+    public enum Sfx { Jump, Land, Dash, Swing, Hit, EnemyHurt, EnemyDie, PlayerHurt, Spit, Shockwave, BossRoar, Checkpoint, Goal, Acid, Pogo, Coin, Shoot, GameOver }
     public enum Fx { HitSpark, Dust, DeathBurst, AcidSplash }
 
     /// <summary>

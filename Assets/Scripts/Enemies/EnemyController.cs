@@ -43,7 +43,8 @@ namespace Game
         /// <summary>Se dispara cuando empieza el aviso de un ataque.</summary>
         public event Action<EnemyAttack> AttackStarted;
 
-        public Health Health => health;
+        // Perezoso: otros componentes pueden pedirlo en su OnEnable, antes del Awake de este.
+        public Health Health => health != null ? health : health = GetComponent<Health>();
         public EnemyConfig Config => config;
         public bool IsDormant => state == State.Dormant;
 
